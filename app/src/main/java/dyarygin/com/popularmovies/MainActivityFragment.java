@@ -11,6 +11,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
 
@@ -65,6 +66,7 @@ public class MainActivityFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+        //updateMovies("popularity.desc","w185");
         updateMovies("popularity.desc","w185");
     }
 
@@ -198,9 +200,17 @@ public class MainActivityFragment extends Fragment {
                 for (String movieStr : result) {
                     movieArrayList.add(movieStr);
                 }
-                String[] strarray = movieArrayList.toArray(new String[result.length]);
+                final String[] strarray = movieArrayList.toArray(new String[result.length]);
                 ImageAdapter imageAdapter =  new ImageAdapter(getActivity(), strarray);
                 gridview.setAdapter(imageAdapter);
+
+                gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        Toast.makeText(getContext(), "" + strarray[position],
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
             } else {
                 errorWhileRetrieving();
             }
