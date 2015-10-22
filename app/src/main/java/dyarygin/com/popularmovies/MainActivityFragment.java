@@ -1,5 +1,6 @@
 package dyarygin.com.popularmovies;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -29,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivityFragment extends Fragment {
+    public final static String EXTRA_MOVIEURL = "dyarygin.com.popularmoview.MOVIEURL";
 
     public MainActivityFragment() {
     }
@@ -207,8 +209,11 @@ public class MainActivityFragment extends Fragment {
                 gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        Toast.makeText(getContext(), "" + strarray[position],
-                                Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(getContext(), "" + strarray[position],
+//                                Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(getActivity(), DetailActivity.class);
+                        intent.putExtra(EXTRA_MOVIEURL, strarray[position]);
+                        startActivity(intent);
                     }
                 });
             } else {
