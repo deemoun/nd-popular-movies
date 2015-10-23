@@ -52,9 +52,11 @@ public class MainActivityFragment extends Fragment {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_refresh) {
+        if (id == R.id.show_most_popular) {
             updateMovies("popularity.desc", "w185");
-        }
+        } else if (id == R.id.show_highest_rated) {
+            updateMovies("vote_count.desc", "w185");
+        };
         return super.onOptionsItemSelected(item);
     }
 
@@ -68,7 +70,6 @@ public class MainActivityFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        //updateMovies("popularity.desc","w185");
         updateMovies("popularity.desc","w185");
     }
 
@@ -209,8 +210,6 @@ public class MainActivityFragment extends Fragment {
                 gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                        Toast.makeText(getContext(), "" + strarray[position],
-//                                Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(getActivity(), DetailActivity.class);
                         intent.putExtra(EXTRA_MOVIEURL, strarray[position]);
                         startActivity(intent);

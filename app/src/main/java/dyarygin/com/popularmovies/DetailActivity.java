@@ -4,9 +4,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.widget.Toast;
 
 public class DetailActivity extends AppCompatActivity {
+
+    private Bundle bundle = new Bundle();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,11 +19,20 @@ public class DetailActivity extends AppCompatActivity {
         Intent intent = getIntent();
         String movieImage = intent.getStringExtra(MainActivityFragment.EXTRA_MOVIEURL);
 
-        Toast.makeText(this, "From Intent: " + movieImage,
-                Toast.LENGTH_SHORT).show();
+        DetailActivityFragment fragobj = new DetailActivityFragment();
+        bundle.putString("message", movieImage);
+            // set Fragmentclass Arguments
+        fragobj.setArguments(bundle);
+
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
     }
+
+//    public String getDataString() {
+//        Intent intent = getIntent();
+//        String movieImage = intent.getStringExtra(MainActivityFragment.EXTRA_MOVIEURL);
+//        return movieImage;
+//    }
 
 }
