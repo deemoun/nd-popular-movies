@@ -7,11 +7,10 @@
     android:background="@color/backgroundColor"
     tools:context="dyarygin.com.popularmovies.DetailActivityFragment">
 
-
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/imageView"
         android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"/>
 </RelativeLayout>

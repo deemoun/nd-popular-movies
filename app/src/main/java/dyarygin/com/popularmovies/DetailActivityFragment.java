@@ -27,11 +27,11 @@ public class DetailActivityFragment extends Fragment {
         ImageView imageView = (ImageView) view.findViewById(R.id.imageView);
 
         Picasso.with(getContext())
-                .load("http://www.helenplum.org/system/files/movie-night-clipart-9cp4q9xcE.jpeg.jpg")
+                .load(R.drawable.movie_image)
                         //TODO: Add placeholder and error resources
                         // .placeholder(R.drawable.)
                         //.error(R.drawable.)
-                .noFade().resize(700,700)
+                .noFade().resize(1000,1000)
                 .centerCrop()
                 .into(imageView);
         imageView.setAdjustViewBounds(true);

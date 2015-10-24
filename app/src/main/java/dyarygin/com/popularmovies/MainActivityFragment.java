@@ -39,6 +39,7 @@ public class MainActivityFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        updateMovies("popularity.desc","w185");
     }
 
     @Override
@@ -70,7 +71,7 @@ public class MainActivityFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        updateMovies("popularity.desc","w185");
+
     }
 
     public void updateMovies(String sortOrder, String imgSize){
@@ -220,6 +221,15 @@ public class MainActivityFragment extends Fragment {
             }
 
         }
+    }
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
     }
 }
 

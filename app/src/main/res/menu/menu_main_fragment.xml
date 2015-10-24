@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivityFragment">>
-    <item android:id="@+id/show_most_popular" android:title="@string/most_popular"
-        android:orderInCategory="100" app:showAsAction="never" />
-    <item android:id="@+id/show_highest_rated" android:title="@string/highest_rated"
-        android:orderInCategory="200" app:showAsAction="never" />
+    xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivityFragment">
+    <item android:id="@+id/sort_by" android:title="SORT BY"
+        android:orderInCategory="10" app:showAsAction="always"
+        android:icon="@drawable/sortby_icon">
+    <menu xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+        <item android:id="@+id/show_most_popular" android:title="@string/most_popular"
+            android:orderInCategory="100" app:showAsAction="never" />
+        <item android:id="@+id/show_highest_rated" android:title="@string/highest_rated"
+            android:orderInCategory="200" app:showAsAction="never" />
+    </menu>
+    </item>
 </menu>
