@@ -7,7 +7,7 @@ import android.support.v7.widget.Toolbar;
 
 public class DetailActivity extends AppCompatActivity {
 
-    private Bundle bundle = new Bundle();
+    public Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -16,23 +16,14 @@ public class DetailActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        Intent intent = getIntent();
-        String movieImage = intent.getStringExtra(MainActivityFragment.EXTRA_MOVIEURL);
-
-        DetailActivityFragment fragobj = new DetailActivityFragment();
-        bundle.putString("message", movieImage);
-            // set Fragmentclass Arguments
-        fragobj.setArguments(bundle);
-
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
     }
 
-//    public String getDataString() {
-//        Intent intent = getIntent();
-//        String movieImage = intent.getStringExtra(MainActivityFragment.EXTRA_MOVIEURL);
-//        return movieImage;
-//    }
+    public String getMovieImage() {
+        intent = getIntent();
+        String movieImage = intent.getStringExtra(MainActivityFragment.EXTRA_MOVIEURL);
+        return movieImage;
+    }
 
 }

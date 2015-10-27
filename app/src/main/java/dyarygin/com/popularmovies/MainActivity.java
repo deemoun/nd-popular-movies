@@ -3,6 +3,7 @@ package dyarygin.com.popularmovies;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -18,7 +19,11 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        if (Config.SHOW_MAIN_ACTIVITY_MENU) {
+            getMenuInflater().inflate(R.menu.menu_main, menu);
+        } else {
+            Log.v("Log", "Main menu is disabled");
+        }
         return true;
     }
 

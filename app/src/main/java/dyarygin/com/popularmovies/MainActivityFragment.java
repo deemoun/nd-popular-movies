@@ -39,7 +39,6 @@ public class MainActivityFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        updateMovies("popularity.desc","w185");
     }
 
     @Override
@@ -49,22 +48,21 @@ public class MainActivityFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.show_most_popular) {
-            updateMovies("popularity.desc", "w185");
-        } else if (id == R.id.show_highest_rated) {
-            updateMovies("vote_count.desc", "w185");
-        };
+
+        switch (id) {
+            case R.id.show_most_popular: updateMovies("popularity.desc", "w185");
+                break;
+            case R.id.show_highest_rated: updateMovies("vote_count.desc", "w185");
+                break;
+        }
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
+        updateMovies("popularity.desc","w185");
         return inflater.inflate(R.layout.fragment_main, container, false);
     }
 
@@ -106,6 +104,7 @@ public class MainActivityFragment extends Fragment {
                 String movieId = movieTitle.getString("id");
 
                 resultStr[i] = ImageBaseUrl + movieImageValue;
+                System.out.println("Movie ID is " + movieId);
             }
             return resultStr;
         }
@@ -206,6 +205,9 @@ public class MainActivityFragment extends Fragment {
                 }
                 final String[] strarray = movieArrayList.toArray(new String[result.length]);
                 ImageAdapter imageAdapter =  new ImageAdapter(getActivity(), strarray);
+
+                // Setting the Adapter and onCick listener on it
+
                 gridview.setAdapter(imageAdapter);
 
                 gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {

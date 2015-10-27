@@ -17,8 +17,11 @@ public class DetailActivityFragment extends Fragment {
     public DetailActivityFragment() {
     }
 
-    Bundle bundle;
-    String myValue;
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -26,18 +29,19 @@ public class DetailActivityFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
         ImageView imageView = (ImageView) view.findViewById(R.id.imageView);
 
+        DetailActivity detailActivity = (DetailActivity) getActivity();
+        String movieImage = detailActivity.getMovieImage();
+
         Picasso.with(getContext())
-                .load(R.drawable.movie_image)
+                .load(movieImage)
                         //TODO: Add placeholder and error resources
                         // .placeholder(R.drawable.)
                         //.error(R.drawable.)
-                .noFade().resize(1000,1000)
+                .noFade().resize(400,500)
                 .centerCrop()
                 .into(imageView);
         imageView.setAdjustViewBounds(true);
-//
-//        Toast.makeText(getContext(), "From Activity: " + myValue,
-//                Toast.LENGTH_SHORT).show();
+
 
         return view;
     }
@@ -45,8 +49,15 @@ public class DetailActivityFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-//        bundle = getArguments();
-//        myValue = this.bundle.getString("message");
-//        Log.e("VALUE IS:", myValue);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
     }
 }

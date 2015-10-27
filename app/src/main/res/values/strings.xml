@@ -4,4 +4,5 @@
     <string name="most_popular">Most popular</string>
     <string name="highest_rated">Highest rated</string>
     <string name="title_activity_detail">Movie Details</string>
+    <string name="sort_by">SORT BY</string>
 </resources>
