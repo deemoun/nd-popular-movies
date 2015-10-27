@@ -10,15 +10,15 @@ import com.squareup.picasso.Picasso;
 
 public class ImageAdapter extends BaseAdapter {
     private Context mContext;
-    private String[] adapterString;
+    private String[] adapterArray;
 
     public ImageAdapter(Context c, String[] a) {
         mContext = c;
-        adapterString = a;
+        adapterArray = a;
     }
 
     public int getCount() {
-        return adapterString.length;
+        return adapterArray.length;
     }
 
     public Object getItem(int position) {
@@ -39,7 +39,7 @@ public class ImageAdapter extends BaseAdapter {
         }
 
         Picasso.with(mContext)
-                .load(adapterString[position])
+                .load(adapterArray[position])
                         //TODO: Add placeholder and error resources
                         // .placeholder(R.drawable.)
                         //.error(R.drawable.)
@@ -47,7 +47,6 @@ public class ImageAdapter extends BaseAdapter {
                 .centerCrop()
                 .into(imageView);
         imageView.setAdjustViewBounds(true);
-
 
         return imageView;
 

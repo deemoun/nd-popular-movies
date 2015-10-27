@@ -30,7 +30,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivityFragment extends Fragment {
-    public final static String EXTRA_MOVIEURL = "dyarygin.com.popularmoview.MOVIEURL";
+    public final static String EXTRA_MOVIEIMAGE = "dyarygin.com.popularmovies.MOVIEURL";
+    public final static String EXTRA_MOVIEVOTE = "dyarygin.com.popularmovies.MOVIEVOTE";
+
+    public static List<String> movieIdList = new ArrayList<>();
+    public static List<String> movieImageList = new ArrayList<>();
+    public static List<String> movieOriginalTitleList = new ArrayList<>();
+    public static List<String> movieOverviewList = new ArrayList<>();
+    public static List<String> movieVoteAverage = new ArrayList<>();
+    public static List<String> movieReleaseDate = new ArrayList<>();
+
 
     public MainActivityFragment() {
     }
@@ -73,6 +82,8 @@ public class MainActivityFragment extends Fragment {
     }
 
     public void updateMovies(String sortOrder, String imgSize){
+        movieImageList.clear();
+        movieIdList.clear();
         FetchMovieTask fetchMovieTask = new FetchMovieTask();
         fetchMovieTask.execute(sortOrder, imgSize);
     }
@@ -81,36 +92,35 @@ public class MainActivityFragment extends Fragment {
         Toast.makeText(getContext(), "Error while retrieving data", Toast.LENGTH_LONG).show();
     }
 
-    public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
+    public class FetchMovieTask extends AsyncTask<String, Void, List<String>> {
 
         private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
 
-        private String[] getMovieDataFromJson(String movieJsonStr, String imageSize) throws JSONException {
-
+        private List<String> getMovieDataFromJson(String movieJsonStr, String imageSize) throws JSONException {
             // Getting the root "results" array
             JSONObject movieObject = new JSONObject(movieJsonStr);
 
             JSONArray movieArray = movieObject.getJSONArray("results");
 
-            // Base Url for the images
+            // Base Url for the TMDB images
             final String ImageBaseUrl = "http://image.tmdb.org/t/p/" + imageSize;
-            String[] resultStr = new String[movieArray.length()];
+
 
             for (int i = 0; i < movieArray.length(); i++) {
-
                 JSONObject movieTitle = movieArray.getJSONObject(i);
 
-                String movieImageValue = movieTitle.getString("poster_path");
-                String movieId = movieTitle.getString("id");
-
-                resultStr[i] = ImageBaseUrl + movieImageValue;
-                System.out.println("Movie ID is " + movieId);
+                movieIdList.add(movieTitle.getString("id"));
+                movieImageList.add(ImageBaseUrl + movieTitle.getString("poster_path"));
+                movieOriginalTitleList.add(movieTitle.getString("original_title"));
+                movieOverviewList.add(movieTitle.getString("overview"));
+                movieVoteAverage.add(movieTitle.getString("vote_average"));
+                movieReleaseDate.add(movieTitle.getString("release_date"));
             }
-            return resultStr;
+            return movieImageList;
         }
 
         @Override
-        protected String[] doInBackground(String... params) {
+        protected List<String> doInBackground(String... params) {
 
 
             // If there's no zip code, there's nothing to look up.  Verify size of params.
@@ -195,33 +205,30 @@ public class MainActivityFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(String[] result) {
-            List<String> movieArrayList = new ArrayList<String>();
+        protected void onPostExecute(List<String> result) {
+
             GridView gridview = (GridView) getView().findViewById(R.id.movies_grid);
 
+
             if (result != null) {
-                for (String movieStr : result) {
-                    movieArrayList.add(movieStr);
-                }
-                final String[] strarray = movieArrayList.toArray(new String[result.length]);
-                ImageAdapter imageAdapter =  new ImageAdapter(getActivity(), strarray);
+                final String[] imgArray = result.toArray(new String[result.size()]);
+                final String[] voteArray = movieVoteAverage.toArray(new String[result.size()]);
+                gridview.setAdapter(new ImageAdapter(getActivity(), imgArray));
 
-                // Setting the Adapter and onCick listener on it
-
-                gridview.setAdapter(imageAdapter);
 
                 gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         Intent intent = new Intent(getActivity(), DetailActivity.class);
-                        intent.putExtra(EXTRA_MOVIEURL, strarray[position]);
+                        intent.putExtra(EXTRA_MOVIEIMAGE, imgArray[position]);
+                        intent.putExtra(EXTRA_MOVIEVOTE, voteArray[position]);
                         startActivity(intent);
                     }
                 });
             } else {
                 errorWhileRetrieving();
             }
-
+//
         }
     }
     @Override

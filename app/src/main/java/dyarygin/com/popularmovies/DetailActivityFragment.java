@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
@@ -28,9 +29,14 @@ public class DetailActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
         ImageView imageView = (ImageView) view.findViewById(R.id.imageView);
+        TextView voteAverageTextView = (TextView) view.findViewById(R.id.voteAverageTextView);
 
         DetailActivity detailActivity = (DetailActivity) getActivity();
         String movieImage = detailActivity.getMovieImage();
+        String voteAverage = detailActivity.getVoteAverage();
+
+        voteAverageTextView.setText("Rating: " + voteAverage);
+
 
         Picasso.with(getContext())
                 .load(movieImage)
@@ -41,7 +47,6 @@ public class DetailActivityFragment extends Fragment {
                 .centerCrop()
                 .into(imageView);
         imageView.setAdjustViewBounds(true);
-
 
         return view;
     }
