@@ -30,4 +30,19 @@ public class DetailActivity extends AppCompatActivity {
         return intent.getStringExtra(MainActivityFragment.EXTRA_MOVIEVOTE);
     }
 
+    public String getReleaseDate() {
+        intent = getIntent();
+        return intent.getStringExtra(MainActivityFragment.EXTRA_MOVIERELEASEDATE);
+    }
+
+    public String getOriginalTitle() {
+        intent = getIntent();
+        return intent.getStringExtra(MainActivityFragment.EXTRA_MOVIEORIGINALTITLE);
+    }
+
+    public String getMovieOverview() {
+        intent = getIntent();
+        return intent.getStringExtra(MainActivityFragment.EXTRA_MOVIEOVERVIEW);
+    }
+
 }

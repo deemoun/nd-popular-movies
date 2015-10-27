@@ -28,14 +28,22 @@ public class DetailActivityFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
+
+        // Finding views
         ImageView imageView = (ImageView) view.findViewById(R.id.imageView);
         TextView voteAverageTextView = (TextView) view.findViewById(R.id.voteAverageTextView);
+        TextView movieReleaseDateTextView = (TextView) view.findViewById(R.id.movieReleaseDateTextView);
 
+        // Setting up the views from intent
         DetailActivity detailActivity = (DetailActivity) getActivity();
         String movieImage = detailActivity.getMovieImage();
         String voteAverage = detailActivity.getVoteAverage();
+        String releaseDate = detailActivity.getReleaseDate();
+        String overview = detailActivity.getMovieOverview();
+        String title = detailActivity.getOriginalTitle();
 
         voteAverageTextView.setText("Rating: " + voteAverage);
+        movieReleaseDateTextView.setText("Release date: " + releaseDate);
 
 
         Picasso.with(getContext())

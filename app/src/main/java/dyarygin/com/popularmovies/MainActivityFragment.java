@@ -32,6 +32,9 @@ import java.util.List;
 public class MainActivityFragment extends Fragment {
     public final static String EXTRA_MOVIEIMAGE = "dyarygin.com.popularmovies.MOVIEURL";
     public final static String EXTRA_MOVIEVOTE = "dyarygin.com.popularmovies.MOVIEVOTE";
+    public final static String EXTRA_MOVIERELEASEDATE = "dyarygin.com.popularmovies.MOVIERELEASEDATE";
+    public final static String EXTRA_MOVIEORIGINALTITLE = "dyarygin.com.popularmovies.MOVIEORIGINALTITLE";
+    public final static String EXTRA_MOVIEOVERVIEW = "dyarygin.com.popularmovies.MOVIERELEASEDATE";
 
     public static List<String> movieIdList = new ArrayList<>();
     public static List<String> movieImageList = new ArrayList<>();
@@ -213,6 +216,9 @@ public class MainActivityFragment extends Fragment {
             if (result != null) {
                 final String[] imgArray = result.toArray(new String[result.size()]);
                 final String[] voteArray = movieVoteAverage.toArray(new String[result.size()]);
+                final String[] releaseDate = movieReleaseDate.toArray(new String[result.size()]);
+                final String[] overview = movieOverviewList.toArray(new String[result.size()]);
+                final String[] title = movieOriginalTitleList.toArray(new String[result.size()]);
                 gridview.setAdapter(new ImageAdapter(getActivity(), imgArray));
 
 
@@ -222,6 +228,9 @@ public class MainActivityFragment extends Fragment {
                         Intent intent = new Intent(getActivity(), DetailActivity.class);
                         intent.putExtra(EXTRA_MOVIEIMAGE, imgArray[position]);
                         intent.putExtra(EXTRA_MOVIEVOTE, voteArray[position]);
+                        intent.putExtra(EXTRA_MOVIERELEASEDATE, releaseDate[position]);
+                        intent.putExtra(EXTRA_MOVIEOVERVIEW, overview[position]);
+                        intent.putExtra(EXTRA_MOVIEORIGINALTITLE, title[position]);
                         startActivity(intent);
                     }
                 });

@@ -16,28 +16,19 @@
         android:layout_weight="1"
         />
     <TextView
-        android:id="@+id/voteAverageTextView"
+    android:id="@+id/voteAverageTextView"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="end"
+    android:textColor="@color/textColor"
+    android:layout_weight="3"
+    />
+
+    <TextView
+        android:id="@+id/movieReleaseDateTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
-        android:textColor="#FFFF"
-        android:layout_weight="3"
-        />
+        android:textColor="@color/textColor"
+        android:layout_weight="3"/>
 </LinearLayout>
-
-
-    <!--<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
-    <!--xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"-->
-    <!--android:paddingRight="@dimen/activity_horizontal_margin"-->
-    <!--android:paddingTop="@dimen/activity_vertical_margin"-->
-    <!--android:paddingBottom="@dimen/activity_vertical_margin" tools:showIn="@layout/activity_detail"-->
-    <!--android:background="@color/backgroundColor"-->
-    <!--tools:context="dyarygin.com.popularmovies.DetailActivityFragment">-->
-    <!--<ImageView-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:id="@+id/imageView"-->
-    <!--android:layout_alignParentTop="true"-->
-    <!--android:layout_alignParentStart="true" />-->
-    <!--</RelativeLayout>-->
