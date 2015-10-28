@@ -30,14 +30,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivityFragment extends Fragment {
-    public final static String EXTRA_MOVIEIMAGE = "dyarygin.com.popularmovies.MOVIEURL";
+    public final static String EXTRA_MOVIEIMAGE = "dyarygin.com.popularmovies.MOVIEIMAGE";
+    public final static String EXTRA_MOVIEBACKDROPPATH = "dyarygin.com.popularmovies.MOVIEBACKDROPPATH";
     public final static String EXTRA_MOVIEVOTE = "dyarygin.com.popularmovies.MOVIEVOTE";
     public final static String EXTRA_MOVIERELEASEDATE = "dyarygin.com.popularmovies.MOVIERELEASEDATE";
     public final static String EXTRA_MOVIEORIGINALTITLE = "dyarygin.com.popularmovies.MOVIEORIGINALTITLE";
-    public final static String EXTRA_MOVIEOVERVIEW = "dyarygin.com.popularmovies.MOVIERELEASEDATE";
+    public final static String EXTRA_MOVIEOVERVIEW = "dyarygin.com.popularmovies.MOVIEOVERVIEW";
 
     public static List<String> movieIdList = new ArrayList<>();
     public static List<String> movieImageList = new ArrayList<>();
+    public static List<String> movieBackdropPathList = new ArrayList<>();
     public static List<String> movieOriginalTitleList = new ArrayList<>();
     public static List<String> movieOverviewList = new ArrayList<>();
     public static List<String> movieVoteAverage = new ArrayList<>();
@@ -65,7 +67,7 @@ public class MainActivityFragment extends Fragment {
         switch (id) {
             case R.id.show_most_popular: updateMovies("popularity.desc", "w185");
                 break;
-            case R.id.show_highest_rated: updateMovies("vote_count.desc", "w185");
+            case R.id.show_highest_rated: updateMovies("vote_average.desc", "w185");
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -74,7 +76,7 @@ public class MainActivityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        updateMovies("popularity.desc","w185");
+        updateMovies("popularity.desc", "w185");
         return inflater.inflate(R.layout.fragment_main, container, false);
     }
 
@@ -114,6 +116,7 @@ public class MainActivityFragment extends Fragment {
 
                 movieIdList.add(movieTitle.getString("id"));
                 movieImageList.add(ImageBaseUrl + movieTitle.getString("poster_path"));
+                movieBackdropPathList.add(ImageBaseUrl + movieTitle.getString("backdrop_path"));
                 movieOriginalTitleList.add(movieTitle.getString("original_title"));
                 movieOverviewList.add(movieTitle.getString("overview"));
                 movieVoteAverage.add(movieTitle.getString("vote_average"));
@@ -125,14 +128,10 @@ public class MainActivityFragment extends Fragment {
         @Override
         protected List<String> doInBackground(String... params) {
 
-
-            // If there's no zip code, there's nothing to look up.  Verify size of params.
             if (params.length == 0) {
                 return null;
             }
 
-            // These two need to be declared outside the try/catch
-            // so that they can be closed in the finally block.
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
 
@@ -168,9 +167,7 @@ public class MainActivityFragment extends Fragment {
 
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
-                    // But it does make debugging a *lot* easier if you print out the completed
-                    // buffer for debugging.
+
                     buffer.append(line + "\n");
                 }
 
@@ -183,8 +180,6 @@ public class MainActivityFragment extends Fragment {
 
             } catch (IOException e) {
                 Log.e(LOG_TAG, "Error ", e);
-                // If the code didn't successfully get the weather data, there's no point in attemping
-                // to parse it.
                 return null;
             } finally {
                 if (urlConnection != null) {
@@ -215,10 +210,11 @@ public class MainActivityFragment extends Fragment {
 
             if (result != null) {
                 final String[] imgArray = result.toArray(new String[result.size()]);
-                final String[] voteArray = movieVoteAverage.toArray(new String[result.size()]);
-                final String[] releaseDate = movieReleaseDate.toArray(new String[result.size()]);
-                final String[] overview = movieOverviewList.toArray(new String[result.size()]);
-                final String[] title = movieOriginalTitleList.toArray(new String[result.size()]);
+                final String[] backdropPath = movieBackdropPathList.toArray(new String[movieBackdropPathList.size()]);
+                final String[] voteArray = movieVoteAverage.toArray(new String[movieVoteAverage.size()]);
+                final String[] releaseDate = movieReleaseDate.toArray(new String[movieReleaseDate.size()]);
+                final String[] overview = movieOverviewList.toArray(new String[movieOverviewList.size()]);
+                final String[] title = movieOriginalTitleList.toArray(new String[movieOriginalTitleList.size()]);
                 gridview.setAdapter(new ImageAdapter(getActivity(), imgArray));
 
 
@@ -227,6 +223,7 @@ public class MainActivityFragment extends Fragment {
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         Intent intent = new Intent(getActivity(), DetailActivity.class);
                         intent.putExtra(EXTRA_MOVIEIMAGE, imgArray[position]);
+                        intent.putExtra(EXTRA_MOVIEBACKDROPPATH, backdropPath[position]);
                         intent.putExtra(EXTRA_MOVIEVOTE, voteArray[position]);
                         intent.putExtra(EXTRA_MOVIERELEASEDATE, releaseDate[position]);
                         intent.putExtra(EXTRA_MOVIEOVERVIEW, overview[position]);
@@ -237,9 +234,9 @@ public class MainActivityFragment extends Fragment {
             } else {
                 errorWhileRetrieving();
             }
-//
         }
     }
+
     @Override
     public void onPause() {
         super.onPause();

@@ -25,6 +25,11 @@ public class DetailActivity extends AppCompatActivity {
         return intent.getStringExtra(MainActivityFragment.EXTRA_MOVIEIMAGE);
     }
 
+    public String getMovieBackdropPath() {
+        intent = getIntent();
+        return intent.getStringExtra(MainActivityFragment.EXTRA_MOVIEBACKDROPPATH);
+    }
+
     public String getVoteAverage() {
         intent = getIntent();
         return intent.getStringExtra(MainActivityFragment.EXTRA_MOVIEVOTE);

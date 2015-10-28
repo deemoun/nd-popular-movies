@@ -33,21 +33,26 @@ public class DetailActivityFragment extends Fragment {
         ImageView imageView = (ImageView) view.findViewById(R.id.imageView);
         TextView voteAverageTextView = (TextView) view.findViewById(R.id.voteAverageTextView);
         TextView movieReleaseDateTextView = (TextView) view.findViewById(R.id.movieReleaseDateTextView);
+        TextView movieOverviewTextView = (TextView) view.findViewById(R.id.movieOverviewTextView);
+        TextView movieOriginalTitleTextView = (TextView) view.findViewById(R.id.movieOriginalTitleTextView);
 
         // Setting up the views from intent
         DetailActivity detailActivity = (DetailActivity) getActivity();
-        String movieImage = detailActivity.getMovieImage();
+        String posterImage = detailActivity.getMovieImage();
+        String movieBackdropPath = detailActivity.getMovieBackdropPath();
         String voteAverage = detailActivity.getVoteAverage();
         String releaseDate = detailActivity.getReleaseDate();
         String overview = detailActivity.getMovieOverview();
         String title = detailActivity.getOriginalTitle();
 
-        voteAverageTextView.setText("Rating: " + voteAverage);
-        movieReleaseDateTextView.setText("Release date: " + releaseDate);
+        voteAverageTextView.setText(R.string.vote_average + " " + voteAverage);
+        movieReleaseDateTextView.setText(R.string.release_date + " " + releaseDate);
+        movieOriginalTitleTextView.setText(R.string.title + " " + title);
+        movieOverviewTextView.setText(R.string.overview + " " + overview);
 
 
         Picasso.with(getContext())
-                .load(movieImage)
+                .load(posterImage)
                         //TODO: Add placeholder and error resources
                         // .placeholder(R.drawable.)
                         //.error(R.drawable.)
