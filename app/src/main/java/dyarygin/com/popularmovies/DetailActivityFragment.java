@@ -30,11 +30,11 @@ public class DetailActivityFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
 
         // Finding views
-        ImageView imageView = (ImageView) view.findViewById(R.id.imageView);
+        TextView movieOriginalTitleTextView = (TextView) view.findViewById(R.id.movieOriginalTitleTextView);
+        ImageView posterImageView = (ImageView) view.findViewById(R.id.posterImageView);
         TextView voteAverageTextView = (TextView) view.findViewById(R.id.voteAverageTextView);
         TextView movieReleaseDateTextView = (TextView) view.findViewById(R.id.movieReleaseDateTextView);
         TextView movieOverviewTextView = (TextView) view.findViewById(R.id.movieOverviewTextView);
-        TextView movieOriginalTitleTextView = (TextView) view.findViewById(R.id.movieOriginalTitleTextView);
 
         // Setting up the views from intent
         DetailActivity detailActivity = (DetailActivity) getActivity();
@@ -45,10 +45,10 @@ public class DetailActivityFragment extends Fragment {
         String overview = detailActivity.getMovieOverview();
         String title = detailActivity.getOriginalTitle();
 
-        voteAverageTextView.setText(R.string.vote_average + " " + voteAverage);
-        movieReleaseDateTextView.setText(R.string.release_date + " " + releaseDate);
-        movieOriginalTitleTextView.setText(R.string.title + " " + title);
-        movieOverviewTextView.setText(R.string.overview + " " + overview);
+        movieOriginalTitleTextView.setText(title);
+        voteAverageTextView.setText(getString(R.string.vote_average) + ": " + voteAverage);
+        movieReleaseDateTextView.setText(releaseDate);
+        movieOverviewTextView.setText(overview);
 
 
         Picasso.with(getContext())
@@ -56,10 +56,9 @@ public class DetailActivityFragment extends Fragment {
                         //TODO: Add placeholder and error resources
                         // .placeholder(R.drawable.)
                         //.error(R.drawable.)
-                .noFade().resize(400,500)
+                .noFade().resize(555,834)
                 .centerCrop()
-                .into(imageView);
-        imageView.setAdjustViewBounds(true);
+                .into(posterImageView);
 
         return view;
     }

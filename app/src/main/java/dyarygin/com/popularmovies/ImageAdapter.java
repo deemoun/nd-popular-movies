@@ -43,7 +43,7 @@ public class ImageAdapter extends BaseAdapter {
                         //TODO: Add placeholder and error resources
                         // .placeholder(R.drawable.)
                         //.error(R.drawable.)
-                .noFade().resize(400,650)
+                .noFade().resize(555,834)
                 .centerCrop()
                 .into(imageView);
         imageView.setAdjustViewBounds(true);

@@ -37,6 +37,9 @@ public class MainActivityFragment extends Fragment {
     public final static String EXTRA_MOVIEORIGINALTITLE = "dyarygin.com.popularmovies.MOVIEORIGINALTITLE";
     public final static String EXTRA_MOVIEOVERVIEW = "dyarygin.com.popularmovies.MOVIEOVERVIEW";
 
+    // Image size format used for the displaying images
+    public final static String IMAGE_FORMAT = "w185";
+
     public static List<String> movieIdList = new ArrayList<>();
     public static List<String> movieImageList = new ArrayList<>();
     public static List<String> movieBackdropPathList = new ArrayList<>();
@@ -65,9 +68,9 @@ public class MainActivityFragment extends Fragment {
         int id = item.getItemId();
 
         switch (id) {
-            case R.id.show_most_popular: updateMovies("popularity.desc", "w185");
+            case R.id.show_most_popular: updateMovies("popularity.desc", IMAGE_FORMAT);
                 break;
-            case R.id.show_highest_rated: updateMovies("vote_average.desc", "w185");
+            case R.id.show_highest_rated: updateMovies("vote_average.desc", IMAGE_FORMAT);
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -76,7 +79,7 @@ public class MainActivityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        updateMovies("popularity.desc", "w185");
+        updateMovies("popularity.desc", IMAGE_FORMAT);
         return inflater.inflate(R.layout.fragment_main, container, false);
     }
 
@@ -87,8 +90,13 @@ public class MainActivityFragment extends Fragment {
     }
 
     public void updateMovies(String sortOrder, String imgSize){
-        movieImageList.clear();
         movieIdList.clear();
+        movieImageList.clear();
+        movieBackdropPathList.clear();
+        movieOriginalTitleList.clear();
+        movieVoteAverage.clear();
+        movieReleaseDate.clear();
+        movieOverviewList.clear();
         FetchMovieTask fetchMovieTask = new FetchMovieTask();
         fetchMovieTask.execute(sortOrder, imgSize);
     }
@@ -217,7 +225,7 @@ public class MainActivityFragment extends Fragment {
                 final String[] title = movieOriginalTitleList.toArray(new String[movieOriginalTitleList.size()]);
                 gridview.setAdapter(new ImageAdapter(getActivity(), imgArray));
 
-
+                // Setting onClickListener on GridView
                 gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
