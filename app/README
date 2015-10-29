@@ -1,0 +1,4 @@
+This is a "Popular Movies" project for Android Developer Nanodegree.
+
+API KEY needs to be obtained in order for this project to work.
+It should be added to Config class as "DBAPIKEY" constant.
