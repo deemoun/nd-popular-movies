@@ -38,7 +38,21 @@
     android:textColor="@color/textColor"
     android:layout_toEndOf="@+id/posterImageView"
     android:layout_below="@id/movieOriginalTitleTextView"
+    android:paddingBottom="10dp"
     />
+
+    <TextView
+        android:id="@+id/movieReleaseDateLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:layout_toEndOf="@id/posterImageView"
+        android:text="Release date:"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/textColor"
+        android:layout_below="@id/voteAverageTextView"
+        />
 
     <TextView
         android:id="@+id/movieReleaseDateTextView"
@@ -47,7 +61,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/textColor"
-        android:layout_below="@+id/voteAverageTextView"
+        android:layout_below="@+id/movieReleaseDateLabel"
         android:layout_toEndOf="@+id/posterImageView"
         android:textAppearance="?android:attr/textAppearanceMedium"/>
     <TextView
