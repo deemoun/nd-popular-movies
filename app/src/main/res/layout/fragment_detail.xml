@@ -15,23 +15,29 @@
         android:id="@+id/movieOriginalTitleTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/textColor"
-        android:layout_above="@+id/posterImageView"/>
+        android:textColor="#da6765"
+        android:textStyle="bold"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:paddingBottom="10dp"/>
     <ImageView
         android:layout_alignParentStart="true"
         android:id="@+id/posterImageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/movieOriginalTitleTextView"
+        android:paddingBottom="10dp"/>
 
     <TextView
     android:id="@+id/voteAverageTextView"
     android:paddingStart="10dp"
+    android:textAppearance="?android:attr/textAppearanceMedium"
     android:paddingEnd="10dp"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:textColor="@color/textColor"
     android:layout_toEndOf="@+id/posterImageView"
+    android:layout_below="@id/movieOriginalTitleTextView"
     />
 
     <TextView
@@ -42,19 +48,25 @@
         android:layout_height="wrap_content"
         android:textColor="@color/textColor"
         android:layout_below="@+id/voteAverageTextView"
-        android:layout_toEndOf="@+id/posterImageView"/>
+        android:layout_toEndOf="@+id/posterImageView"
+        android:textAppearance="?android:attr/textAppearanceMedium"/>
     <TextView
         android:id="@+id/movieOverviewLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/overview"
         android:textColor="@color/textColor"
-        android:layout_below="@+id/posterImageView" />
+        android:layout_below="@+id/posterImageView"
+        android:textStyle="bold"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:paddingBottom="10dp"/>
     <TextView
         android:id="@+id/movieOverviewTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/textColor"
-        android:layout_below="@+id/movieOverviewLabel"/>
+        android:layout_below="@+id/movieOverviewLabel"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textStyle="italic"/>
 </RelativeLayout>
 </ScrollView>
