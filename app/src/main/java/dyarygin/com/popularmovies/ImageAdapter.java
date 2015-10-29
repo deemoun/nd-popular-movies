@@ -11,10 +11,14 @@ import com.squareup.picasso.Picasso;
 public class ImageAdapter extends BaseAdapter {
     private Context mContext;
     private String[] adapterArray;
+    private int adapterWidth;
+    private int adapterHeight;
 
-    public ImageAdapter(Context c, String[] a) {
+    public ImageAdapter(Context c, String[] a, int w, int h) {
         mContext = c;
         adapterArray = a;
+        adapterWidth = w;
+        adapterHeight = h;
     }
 
     public int getCount() {
@@ -40,10 +44,9 @@ public class ImageAdapter extends BaseAdapter {
 
         Picasso.with(mContext)
                 .load(adapterArray[position])
-                        //TODO: Add placeholder and error resources
-                        // .placeholder(R.drawable.)
-                        //.error(R.drawable.)
-                .noFade().resize(555,834)
+                .placeholder(R.drawable.movie_placeholder)
+                .error(R.drawable.no_movie_image)
+                .noFade().resize(adapterWidth, adapterHeight)
                 .centerCrop()
                 .into(imageView);
         imageView.setAdjustViewBounds(true);

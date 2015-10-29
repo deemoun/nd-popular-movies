@@ -1,5 +1,6 @@
 package dyarygin.com.popularmovies;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -10,10 +11,9 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-/**
- * A placeholder fragment containing a simple view.
- */
 public class DetailActivityFragment extends Fragment {
+
+    private Context context;
 
     public DetailActivityFragment() {
     }
@@ -46,20 +46,21 @@ public class DetailActivityFragment extends Fragment {
         String title = detailActivity.getOriginalTitle();
 
         movieOriginalTitleTextView.setText(title);
-        voteAverageTextView.setText(getString(R.string.vote_average) + ": " + voteAverage);
+        voteAverageTextView.setText(getString(R.string.vote_average) + voteAverage);
         movieReleaseDateTextView.setText(releaseDate);
-        movieOverviewTextView.setText(overview);
+        if (overview.contentEquals("null")) {
+            movieOverviewTextView.setText(getString(R.string.no_movie_overview));
+        } else {
+            movieOverviewTextView.setText(overview);
+        }
 
-
-        Picasso.with(getContext())
-                .load(posterImage)
-                        //TODO: Add placeholder and error resources
-                        // .placeholder(R.drawable.)
-                        //.error(R.drawable.)
-                .noFade().resize(555,834)
-                .centerCrop()
-                .into(posterImageView);
-
+            Picasso.with(context)
+                    .load(posterImage)
+                    .placeholder(R.drawable.movie_placeholder)
+                    .error(R.drawable.no_movie_image)
+                    .noFade().resize(555, 834)
+                    .centerCrop()
+                    .into(posterImageView);
         return view;
     }
 

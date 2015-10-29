@@ -6,8 +6,9 @@
     <string name="title_activity_detail">Movie Details</string>
     <string name="sort_by">SORT BY</string>
     <!-- Detail view labels !-->
-    <string name="vote_average">Vote average</string>
-    <string name="release_date">Release date</string>
-    <string name="overview">Overview</string>
+    <string name="vote_average">User rating: </string>
+    <string name="release_date">Release date:</string>
+    <string name="overview">Synopsis</string>
+    <string name="no_movie_overview">No movie overview</string>
     <string name="title">Title</string>
 </resources>

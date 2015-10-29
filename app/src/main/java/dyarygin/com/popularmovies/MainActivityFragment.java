@@ -79,14 +79,14 @@ public class MainActivityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        View v =  inflater.inflate(R.layout.fragment_main, container, false);
         updateMovies("popularity.desc", IMAGE_FORMAT);
-        return inflater.inflate(R.layout.fragment_main, container, false);
+        return v;
     }
 
     @Override
     public void onStart() {
         super.onStart();
-
     }
 
     public void updateMovies(String sortOrder, String imgSize){
@@ -153,6 +153,7 @@ public class MainActivityFragment extends Fragment {
                 Uri buildUri = Uri.parse(BASE_URL).buildUpon()
                         .appendQueryParameter("sort_by", params[0])
                         .appendQueryParameter("api_key", Config.DBAPIKEY)
+                        .appendQueryParameter("page","1")
                         .build();
 
                 URL url = new URL(buildUri.toString());
@@ -212,10 +213,6 @@ public class MainActivityFragment extends Fragment {
 
         @Override
         protected void onPostExecute(List<String> result) {
-
-            GridView gridview = (GridView) getView().findViewById(R.id.movies_grid);
-
-
             if (result != null) {
                 final String[] imgArray = result.toArray(new String[result.size()]);
                 final String[] backdropPath = movieBackdropPathList.toArray(new String[movieBackdropPathList.size()]);
@@ -223,7 +220,10 @@ public class MainActivityFragment extends Fragment {
                 final String[] releaseDate = movieReleaseDate.toArray(new String[movieReleaseDate.size()]);
                 final String[] overview = movieOverviewList.toArray(new String[movieOverviewList.size()]);
                 final String[] title = movieOriginalTitleList.toArray(new String[movieOriginalTitleList.size()]);
-                gridview.setAdapter(new ImageAdapter(getActivity(), imgArray));
+
+                GridView gridview = (GridView) getView().findViewById(R.id.movies_grid);
+                ImageAdapter imageAdapter = new ImageAdapter(getContext(), imgArray, 555, 834);
+                gridview.setAdapter(imageAdapter);
 
                 // Setting onClickListener on GridView
                 gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
