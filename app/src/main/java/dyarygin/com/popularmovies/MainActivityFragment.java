@@ -152,6 +152,7 @@ public class MainActivityFragment extends Fragment {
 
                 Uri buildUri = Uri.parse(BASE_URL).buildUpon()
                         .appendQueryParameter("sort_by", params[0])
+                        // NOTE: APIKEY should be added to Config class
                         .appendQueryParameter("api_key", Config.DBAPIKEY)
                         .appendQueryParameter("page","1")
                         .build();
