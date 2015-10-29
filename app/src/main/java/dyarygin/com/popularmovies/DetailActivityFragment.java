@@ -46,7 +46,7 @@ public class DetailActivityFragment extends Fragment {
         String title = detailActivity.getOriginalTitle();
 
         movieOriginalTitleTextView.setText(title);
-        voteAverageTextView.setText(getString(R.string.vote_average) + voteAverage);
+        voteAverageTextView.setText(voteAverage);
         movieReleaseDateTextView.setText(releaseDate);
         if (overview.contentEquals("null")) {
             movieOverviewTextView.setText(getString(R.string.no_movie_overview));

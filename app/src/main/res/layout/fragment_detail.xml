@@ -15,7 +15,7 @@
         android:id="@+id/movieOriginalTitleTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="#da6765"
+        android:textColor="@color/colorTitle"
         android:textStyle="bold"
         android:textAppearance="?android:attr/textAppearanceLarge" />
     <ImageView
@@ -28,13 +28,26 @@
         android:layout_below="@+id/movieOriginalTitleTextView"/>
 
     <TextView
+        android:id="@+id/voteAverageTextLabel"
+        style="@style/detailViewStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/posterImageView"
+        android:text="@string/vote_average"
+        android:textStyle="bold"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_below="@id/movieOriginalTitleTextView"
+        />
+
+    <TextView
     android:id="@+id/voteAverageTextView"
     style="@style/detailViewStyle"
     android:textAppearance="?android:attr/textAppearanceMedium"
     android:layout_width="wrap_content"
+    android:textColor="@color/LawnGreen"
     android:layout_height="wrap_content"
     android:layout_toEndOf="@+id/posterImageView"
-    android:layout_below="@id/movieOriginalTitleTextView"
+    android:layout_below="@id/voteAverageTextLabel"
     />
 
     <TextView
@@ -42,8 +55,7 @@
         style="@style/detailViewStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp"
+        android:textStyle="bold"
         android:layout_toEndOf="@id/posterImageView"
         android:text="@string/release_date"
         android:textAppearance="?android:attr/textAppearanceMedium"
@@ -54,6 +66,7 @@
         android:id="@+id/movieReleaseDateTextView"
         style="@style/detailViewStyle"
         android:layout_width="wrap_content"
+        android:textColor="@color/LawnGreen"
         android:layout_height="wrap_content"
         android:layout_below="@+id/movieReleaseDateLabel"
         android:layout_toEndOf="@+id/posterImageView"

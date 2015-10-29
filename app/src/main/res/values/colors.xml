@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#f5060e</color>
+    <color name="colorTitle">#da6765</color>
     <color name="colorPrimaryDark">#e9666c</color>
+    <color name="LawnGreen">#7CFC00</color>
     <color name="colorAccent">#FF4081</color>
     <color name="backgroundColor">#000000</color>
     <color name="textColor">#ffffff</color>
