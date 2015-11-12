@@ -42,7 +42,7 @@ public class ImageAdapter extends BaseAdapter {
             imageView = (ImageView) convertView;
         }
 
-    // Use Picasso to show images
+    // Use Picasso library to show Images
 
         Picasso.with(mContext)
                 .load(adapterArray[position])
