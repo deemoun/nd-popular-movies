@@ -47,10 +47,12 @@ public class MainActivityFragment extends Fragment {
     public static List<String> movieOverviewList = new ArrayList<>();
     public static List<String> movieVoteAverage = new ArrayList<>();
     public static List<String> movieReleaseDate = new ArrayList<>();
+    public MoviesDataSource dataSource;
 
 
     public MainActivityFragment() {
     }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -222,6 +224,11 @@ public class MainActivityFragment extends Fragment {
                 final String[] overview = movieOverviewList.toArray(new String[movieOverviewList.size()]);
                 final String[] title = movieOriginalTitleList.toArray(new String[movieOriginalTitleList.size()]);
 
+                //Creating DataSource object and adding it to database
+                dataSource = new MoviesDataSource(getContext());
+                dataSource.open();
+                
+
                 GridView gridview = (GridView) getView().findViewById(R.id.movies_grid);
                 ImageAdapter imageAdapter = new ImageAdapter(getContext(), imgArray, 555, 834);
                 gridview.setAdapter(imageAdapter);
@@ -237,6 +244,8 @@ public class MainActivityFragment extends Fragment {
                         intent.putExtra(EXTRA_MOVIERELEASEDATE, releaseDate[position]);
                         intent.putExtra(EXTRA_MOVIEOVERVIEW, overview[position]);
                         intent.putExtra(EXTRA_MOVIEORIGINALTITLE, title[position]);
+                        // Experimenting with SQLLite
+                        dataSource.createMovie(title[position]);
                         startActivity(intent);
                     }
                 });
