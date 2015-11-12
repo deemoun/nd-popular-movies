@@ -42,6 +42,8 @@ public class ImageAdapter extends BaseAdapter {
             imageView = (ImageView) convertView;
         }
 
+    // Use Picasso to show images
+
         Picasso.with(mContext)
                 .load(adapterArray[position])
                 .placeholder(R.drawable.movie_placeholder)
