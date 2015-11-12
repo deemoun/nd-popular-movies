@@ -22,7 +22,11 @@ public class DetailActivity extends AppCompatActivity {
 
     public String getMovieImage() {
         intent = getIntent();
-        return intent.getStringExtra(MainActivityFragment.EXTRA_MOVIEIMAGE);
+        String movieImage = intent.getStringExtra(MainActivityFragment.EXTRA_MOVIEIMAGE);
+        String noMovieImage = "R.drawable.no_movie_image";
+        if (movieImage.endsWith("null")){
+            return noMovieImage;
+        } else return movieImage;
     }
 
     public String getMovieBackdropPath() {
