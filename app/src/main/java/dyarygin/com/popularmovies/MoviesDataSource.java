@@ -20,7 +20,7 @@ public class MoviesDataSource {
         dbHelper = new MySQLHelper(context);
     }
 
-    public void open() {
+    public void open () {
         database = dbHelper.getWritableDatabase();
     }
 

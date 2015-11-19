@@ -71,6 +71,18 @@
         android:layout_below="@+id/movieReleaseDateLabel"
         android:layout_toEndOf="@+id/posterImageView"
         android:textAppearance="?android:attr/textAppearanceMedium"/>
+    <Button
+        android:id="@+id/favoriteButton"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:background="#FFFFFF"
+        android:text="Mark as Favorite"
+        android:layout_below="@+id/movieReleaseDateTextView"
+        android:layout_toEndOf="@+id/posterImageView"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        />
     <TextView
         android:id="@+id/movieOverviewLabel"
         style="@style/detailViewStyle"

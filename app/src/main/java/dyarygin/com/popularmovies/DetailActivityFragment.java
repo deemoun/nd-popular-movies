@@ -6,17 +6,22 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import butterknife.ButterKnife;
+
 public class DetailActivityFragment extends Fragment {
 
     private Context context;
+    private MoviesDataSource dataSource;
 
     public DetailActivityFragment() {
     }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -30,14 +35,16 @@ public class DetailActivityFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
 
         // Finding views
-        TextView movieOriginalTitleTextView = (TextView) view.findViewById(R.id.movieOriginalTitleTextView);
-        ImageView posterImageView = (ImageView) view.findViewById(R.id.posterImageView);
-        TextView voteAverageTextView = (TextView) view.findViewById(R.id.voteAverageTextView);
-        TextView movieReleaseDateTextView = (TextView) view.findViewById(R.id.movieReleaseDateTextView);
-        TextView movieOverviewTextView = (TextView) view.findViewById(R.id.movieOverviewTextView);
+        TextView movieOriginalTitleTextView = ButterKnife.findById(view, R.id.movieOriginalTitleTextView);
+        ImageView posterImageView = ButterKnife.findById(view, R.id.posterImageView);
+        TextView voteAverageTextView = ButterKnife.findById(view, R.id.voteAverageTextView);
+        TextView movieReleaseDateTextView = ButterKnife.findById(view, R.id.movieReleaseDateTextView);
+        TextView movieOverviewTextView = ButterKnife.findById(view,R.id.movieOverviewTextView);
+        Button favoriteButton = ButterKnife.findById(view, R.id.favoriteButton);
+
 
         // Setting up the views from intent
-        DetailActivity detailActivity = (DetailActivity) getActivity();
+        final DetailActivity detailActivity = (DetailActivity) getActivity();
         String posterImage = detailActivity.getMovieImage();
         String movieBackdropPath = detailActivity.getMovieBackdropPath();
         String voteAverage = detailActivity.getVoteAverage();
@@ -54,6 +61,17 @@ public class DetailActivityFragment extends Fragment {
             movieOverviewTextView.setText(overview);
         }
 
+        //Creating DataSource object and adding it to database
+        dataSource = new MoviesDataSource(getContext());
+        dataSource.open();
+
+        favoriteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dataSource.createMovie(detailActivity.getOriginalTitle());
+            }
+        });
+
             Picasso.with(context)
                     .load(posterImage)
                     .placeholder(R.drawable.movie_placeholder)
@@ -62,7 +80,10 @@ public class DetailActivityFragment extends Fragment {
                     .centerCrop()
                     .into(posterImageView);
         return view;
+
     }
+
+
 
     @Override
     public void onStart() {
@@ -77,5 +98,6 @@ public class DetailActivityFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
+        dataSource.close();
     }
 }

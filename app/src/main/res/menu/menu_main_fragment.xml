@@ -11,6 +11,8 @@
             android:orderInCategory="100" app:showAsAction="never" />
         <item android:id="@+id/show_highest_rated" android:title="@string/highest_rated"
             android:orderInCategory="200" app:showAsAction="never" />
+        <item android:id="@+id/show_favorites" android:title="@string/movie_favorites"
+            android:orderInCategory="300" app:showAsAction="never" />
     </menu>
     </item>
 </menu>

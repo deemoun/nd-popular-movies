@@ -20,7 +20,7 @@ public class MySQLHelper extends SQLiteOpenHelper {
     private static final String DATABASE_CREATE = "create table "
             + TABLE_MOVIES + "(" + COLUMN_ID
             + " integer primary key autoincrement, " + COLUMN_MOVIE_TITLE
-            + " text not null);";
+            +  " text not null);";
 
     public MySQLHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION );
