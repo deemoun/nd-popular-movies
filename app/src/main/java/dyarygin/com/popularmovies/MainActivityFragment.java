@@ -1,10 +1,12 @@
 package dyarygin.com.popularmovies;
 
+import android.app.Fragment;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -82,6 +84,10 @@ public class MainActivityFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v =  inflater.inflate(R.layout.fragment_main, container, false);
+        Toolbar toolbar = (Toolbar) v.findViewById(R.id.toolbar);
+        if(toolbar != null) {
+            ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        }
         updateMovies("popularity.desc", IMAGE_FORMAT);
         return v;
     }
@@ -104,7 +110,7 @@ public class MainActivityFragment extends Fragment {
     }
 
     void errorWhileRetrieving() {
-        Toast.makeText(getContext(), "Error while retrieving data", Toast.LENGTH_LONG).show();
+        Toast.makeText(getActivity().getApplicationContext(), "Error while retrieving data", Toast.LENGTH_LONG).show();
     }
 
     public class FetchMovieTask extends AsyncTask<String, Void, List<String>> {
