@@ -15,23 +15,12 @@ public class DetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detail);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-//        android.support.v4.app.FragmentManager fm = getSupportFragmentManager();
-//        android.support.v4.app.Fragment fragment = fm.findFragmentById(R.id.fragment);
-//
-//        if(fragment == null) {
-//            fragment = new DetailActivityFragment();
-//            fm.beginTransaction()
-//                    .add(R.id.fragment, fragment)
-//                    .commit();
-//        }
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
     }
 
     public String getMovieImage() {
-        intent = getIntent();
-        String movieImage = intent.getStringExtra(MainActivityFragment.EXTRA_MOVIEIMAGE);
+        String movieImage = getIntent().getStringExtra(MainActivityFragment.EXTRA_MOVIEIMAGE);
         String noMovieImage = "R.drawable.no_movie_image";
         if (movieImage.endsWith("null")){
             return noMovieImage;
@@ -39,28 +28,27 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     public String getMovieBackdropPath() {
-        intent = getIntent();
-        return intent.getStringExtra(MainActivityFragment.EXTRA_MOVIEBACKDROPPATH);
+        return getIntent().getStringExtra(MainActivityFragment.EXTRA_MOVIEBACKDROPPATH);
     }
 
     public String getVoteAverage() {
-        intent = getIntent();
-        return intent.getStringExtra(MainActivityFragment.EXTRA_MOVIEVOTE);
+        return getIntent().getStringExtra(MainActivityFragment.EXTRA_MOVIEVOTE);
+    }
+
+    public String getMovieId(){
+        return getIntent().getStringExtra(MainActivityFragment.EXTRA_MOVIEID);
     }
 
     public String getReleaseDate() {
-        intent = getIntent();
-        return intent.getStringExtra(MainActivityFragment.EXTRA_MOVIERELEASEDATE);
+        return getIntent().getStringExtra(MainActivityFragment.EXTRA_MOVIERELEASEDATE);
     }
 
     public String getOriginalTitle() {
-        intent = getIntent();
-        return intent.getStringExtra(MainActivityFragment.EXTRA_MOVIEORIGINALTITLE);
+        return getIntent().getStringExtra(MainActivityFragment.EXTRA_MOVIEORIGINALTITLE);
     }
 
     public String getMovieOverview() {
-        intent = getIntent();
-        return intent.getStringExtra(MainActivityFragment.EXTRA_MOVIEOVERVIEW);
+        return getIntent().getStringExtra(MainActivityFragment.EXTRA_MOVIEOVERVIEW);
     }
 
 }

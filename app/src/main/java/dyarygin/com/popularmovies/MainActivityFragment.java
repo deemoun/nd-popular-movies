@@ -16,7 +16,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,6 +37,7 @@ public class MainActivityFragment extends Fragment {
     public MainActivityFragment() {
     }
 
+    public final static String EXTRA_MOVIEID = "dyarygin.com.popularmovies.MOVIEID";
     public final static String EXTRA_MOVIEIMAGE = "dyarygin.com.popularmovies.MOVIEIMAGE";
     public final static String EXTRA_MOVIEBACKDROPPATH = "dyarygin.com.popularmovies.MOVIEBACKDROPPATH";
     public final static String EXTRA_MOVIEVOTE = "dyarygin.com.popularmovies.MOVIEVOTE";
@@ -64,6 +64,8 @@ public class MainActivityFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        // Clearing a menu to not have an issue with duplicated buttons
+        menu.clear();
         inflater.inflate(R.menu.menu_main_fragment, menu);
     }
 
@@ -76,6 +78,8 @@ public class MainActivityFragment extends Fragment {
                 break;
             case R.id.show_highest_rated: updateMovies("vote_average.desc", IMAGE_FORMAT);
                 break;
+            case R.id.show_favorites: updateMovies();
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -84,10 +88,9 @@ public class MainActivityFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v =  inflater.inflate(R.layout.fragment_main, container, false);
+        setRetainInstance(true);
         Toolbar toolbar = (Toolbar) v.findViewById(R.id.toolbar);
-        if(toolbar != null) {
-            ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-        }
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         updateMovies("popularity.desc", IMAGE_FORMAT);
         return v;
     }
@@ -95,6 +98,15 @@ public class MainActivityFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+    }
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
     }
 
     public void updateMovies(String sortOrder, String imgSize){
@@ -109,163 +121,185 @@ public class MainActivityFragment extends Fragment {
         fetchMovieTask.execute(sortOrder, imgSize);
     }
 
-    void errorWhileRetrieving() {
-        Toast.makeText(getActivity().getApplicationContext(), "Error while retrieving data", Toast.LENGTH_LONG).show();
+    public void updateMovies(){
+        String[] imgArray = new String[1];
+        imgArray[0] = "http://image.tmdb.org/t/p/w185/1n9D32o30XOHMdMWuIT4AaA5ruI.jpg";
+
+
+        View view = getView();
+        if (view != null) {
+            GridView gridview = ButterKnife.findById(view, R.id.movies_grid);
+            ImageAdapter imageAdapter = new ImageAdapter(getActivity().getApplicationContext(), imgArray, 555, 834);
+            gridview.setAdapter(imageAdapter);
+
+            // Setting onClickListener on GridView
+            gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // Handling of the click
+
+                }
+            });
+        }
+
+
     }
 
-    public class FetchMovieTask extends AsyncTask<String, Void, List<String>> {
+    public void setGridView() {
+        final String[] imgArray = movieImageList.toArray(new String[movieImageList.size()]);
+        System.out.println("FAKE_DATA_MOVIEIMAGE_LIST " + imgArray[1]);
+        final String[] backdropPath = movieBackdropPathList.toArray(new String[movieBackdropPathList.size()]);
+        final String[] voteArray = movieVoteAverage.toArray(new String[movieVoteAverage.size()]);
+        System.out.println("FAKE_DATA_MOVIE_VOTE_RATE " + voteArray[1]);
+        final String[] releaseDate = movieReleaseDate.toArray(new String[movieReleaseDate.size()]);
+        System.out.println("FAKE_DATA_MOVIE_RELEASE_DATE " + releaseDate[1]);
+        final String[] overview = movieOverviewList.toArray(new String[movieOverviewList.size()]);
+        System.out.println("FAKE_DATA_MOVIEOVERVIEW_LIST " + overview[1]);
+        final String[] movId = movieIdList.toArray(new String[movieIdList.size()]);
+        System.out.println("FAKE_DATA_MOVIEID " + movId[1]);
+        final String[] title = movieOriginalTitleList.toArray(new String[movieOriginalTitleList.size()]);
+        System.out.println("FAKE_DATA_MOVIEIMAGE_LIST " + title[1]);
 
-        private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
+        View view = getView();
+        if (view != null) {
+            GridView gridview = ButterKnife.findById(view, R.id.movies_grid);
+            ImageAdapter imageAdapter = new ImageAdapter(getActivity().getApplicationContext(), imgArray, 555, 834);
+            gridview.setAdapter(imageAdapter);
 
-        private List<String> getMovieDataFromJson(String movieJsonStr, String imageSize) throws JSONException {
-            // Getting the root "results" array
-            JSONObject movieObject = new JSONObject(movieJsonStr);
+            // Setting onClickListener on GridView
+            gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent intent = new Intent(getActivity(), DetailActivity.class);
+                    intent.putExtra(EXTRA_MOVIEIMAGE, imgArray[position]);
+                    intent.putExtra(EXTRA_MOVIEBACKDROPPATH, backdropPath[position]);
+                    intent.putExtra(EXTRA_MOVIEVOTE, voteArray[position]);
+                    intent.putExtra(EXTRA_MOVIERELEASEDATE, releaseDate[position]);
+                    intent.putExtra(EXTRA_MOVIEOVERVIEW, overview[position]);
+                    intent.putExtra(EXTRA_MOVIEORIGINALTITLE, title[position]);
+                    intent.putExtra(EXTRA_MOVIEID, movId[position]);
+                    startActivity(intent);
 
-            JSONArray movieArray = movieObject.getJSONArray("results");
-
-            // Base Url for the TMDB images
-            final String ImageBaseUrl = "http://image.tmdb.org/t/p/" + imageSize;
-
-
-            for (int i = 0; i < movieArray.length(); i++) {
-                JSONObject movieTitle = movieArray.getJSONObject(i);
-
-                movieIdList.add(movieTitle.getString("id"));
-                movieImageList.add(ImageBaseUrl + movieTitle.getString("poster_path"));
-                movieBackdropPathList.add(ImageBaseUrl + movieTitle.getString("backdrop_path"));
-                movieOriginalTitleList.add(movieTitle.getString("original_title"));
-                movieOverviewList.add(movieTitle.getString("overview"));
-                movieVoteAverage.add(movieTitle.getString("vote_average"));
-                movieReleaseDate.add(movieTitle.getString("release_date"));
-            }
-            return movieImageList;
+                }
+            });
         }
+    }
 
-        @Override
-        protected List<String> doInBackground(String... params) {
+                public class FetchMovieTask extends AsyncTask<String, Void, List<String>> {
 
-            if (params.length == 0) {
-                return null;
-            }
+                    private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
 
-            HttpURLConnection urlConnection = null;
-            BufferedReader reader = null;
+                    private List<String> getMovieDataFromJson(String movieJsonStr, String imageSize) throws JSONException {
+                        // Getting the root "results" array
+                        JSONObject movieObject = new JSONObject(movieJsonStr);
 
-            // Will contain the raw JSON response as a string.
-            String movieDataStr = null;
+                        JSONArray movieArray = movieObject.getJSONArray("results");
 
-            try {
-                // Construct the URL
-                final String BASE_URL = "http://api.themoviedb.org/3/discover/movie?";
-
-                Uri buildUri = Uri.parse(BASE_URL).buildUpon()
-                        .appendQueryParameter("sort_by", params[0])
-                        // NOTE: APIKEY should be added to Config class
-                        .appendQueryParameter("api_key", Config.DBAPIKEY)
-                        .appendQueryParameter("page","1")
-                        .build();
-
-                URL url = new URL(buildUri.toString());
-                Log.e(LOG_TAG, "TMDB url is " + url);
+                        // Base Url for the TMDB images
+                        final String ImageBaseUrl = "http://image.tmdb.org/t/p/" + imageSize;
 
 
-                // Create the request to TMDB
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("GET");
-                urlConnection.connect();
+                        for (int i = 0; i < movieArray.length(); i++) {
+                            JSONObject movieTitle = movieArray.getJSONObject(i);
 
-                // Read the input stream into a String
-                InputStream inputStream = urlConnection.getInputStream();
-                StringBuffer buffer = new StringBuffer();
-                if (inputStream == null) {
-                    // Nothing to do.
-                    return null;
-                }
-                reader = new BufferedReader(new InputStreamReader(inputStream));
-
-                String line;
-                while ((line = reader.readLine()) != null) {
-
-                    buffer.append(line + "\n");
-                }
-
-                if (buffer.length() == 0) {
-                    // Stream was empty.  No point in parsing.
-                    return null;
-                }
-                movieDataStr = buffer.toString();
-                Log.e(LOG_TAG, "DATA STREAM IS " + movieDataStr);
-
-            } catch (IOException e) {
-                Log.e(LOG_TAG, "Error ", e);
-                return null;
-            } finally {
-                if (urlConnection != null) {
-                    urlConnection.disconnect();
-                }
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (final IOException e) {
-                        Log.e(LOG_TAG, "Error closing stream", e);
+                            movieIdList.add(movieTitle.getString("id"));
+                            movieImageList.add(ImageBaseUrl + movieTitle.getString("poster_path"));
+                            movieBackdropPathList.add(ImageBaseUrl + movieTitle.getString("backdrop_path"));
+                            movieOriginalTitleList.add(movieTitle.getString("original_title"));
+                            movieOverviewList.add(movieTitle.getString("overview"));
+                            movieVoteAverage.add(movieTitle.getString("vote_average"));
+                            movieReleaseDate.add(movieTitle.getString("release_date"));
+                        }
+                        return movieImageList;
                     }
-                }
-            }
-            try {
-                return getMovieDataFromJson(movieDataStr,params[1]);
-            } catch (JSONException e) {
-                Log.e(LOG_TAG, e.getMessage(), e);
-                e.printStackTrace();
-            }
-            return null;
-        }
 
-        @Override
-        protected void onPostExecute(List<String> result) {
-            if (result != null) {
-                final String[] imgArray = result.toArray(new String[result.size()]);
-                final String[] backdropPath = movieBackdropPathList.toArray(new String[movieBackdropPathList.size()]);
-                final String[] voteArray = movieVoteAverage.toArray(new String[movieVoteAverage.size()]);
-                final String[] releaseDate = movieReleaseDate.toArray(new String[movieReleaseDate.size()]);
-                final String[] overview = movieOverviewList.toArray(new String[movieOverviewList.size()]);
-                final String[] title = movieOriginalTitleList.toArray(new String[movieOriginalTitleList.size()]);
-
-                View view = getView();
-                if (view != null) {
-                    GridView gridview = ButterKnife.findById(view, R.id.movies_grid);
-                ImageAdapter imageAdapter = new ImageAdapter(getContext(), imgArray, 555, 834);
-                gridview.setAdapter(imageAdapter);
-
-                // Setting onClickListener on GridView
-                gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        Intent intent = new Intent(getActivity(), DetailActivity.class);
-                        intent.putExtra(EXTRA_MOVIEIMAGE, imgArray[position]);
-                        intent.putExtra(EXTRA_MOVIEBACKDROPPATH, backdropPath[position]);
-                        intent.putExtra(EXTRA_MOVIEVOTE, voteArray[position]);
-                        intent.putExtra(EXTRA_MOVIERELEASEDATE, releaseDate[position]);
-                        intent.putExtra(EXTRA_MOVIEOVERVIEW, overview[position]);
-                        intent.putExtra(EXTRA_MOVIEORIGINALTITLE, title[position]);
-                        startActivity(intent);
+                    protected List<String> doInBackground(String... params) {
+
+                        if (params.length == 0) {
+                            return null;
+                        }
+
+                        HttpURLConnection urlConnection = null;
+                        BufferedReader reader = null;
+
+                        // Will contain the raw JSON response as a string.
+                        String movieDataStr = null;
+
+                        try {
+                            // Construct the URL
+                            final String BASE_URL = "http://api.themoviedb.org/3/discover/movie?";
+
+                            Uri buildUri = Uri.parse(BASE_URL).buildUpon()
+                                    .appendQueryParameter("sort_by", params[0])
+                                            // NOTE: APIKEY should be added to Config class
+                                    .appendQueryParameter("api_key", Config.DBAPIKEY)
+                                    .appendQueryParameter("page", "1")
+                                    .build();
+
+                            URL url = new URL(buildUri.toString());
+                            Log.e(LOG_TAG, "TMDB url is " + url);
+
+
+                            // Create the request to TMDB
+                            urlConnection = (HttpURLConnection) url.openConnection();
+                            urlConnection.setRequestMethod("GET");
+                            urlConnection.connect();
+
+                            // Read the input stream into a String
+                            InputStream inputStream = urlConnection.getInputStream();
+                            StringBuffer buffer = new StringBuffer();
+                            if (inputStream == null) {
+                                // Nothing to do.
+                                return null;
+                            }
+                            reader = new BufferedReader(new InputStreamReader(inputStream));
+
+                            String line;
+                            while ((line = reader.readLine()) != null) {
+
+                                buffer.append(line + "\n");
+                            }
+
+                            if (buffer.length() == 0) {
+                                // Stream was empty.  No point in parsing.
+                                return null;
+                            }
+                            movieDataStr = buffer.toString();
+                            Log.e(LOG_TAG, "DATA STREAM IS " + movieDataStr);
+
+                        } catch (IOException e) {
+                            Log.e(LOG_TAG, "Error ", e);
+                            return null;
+                        } finally {
+                            if (urlConnection != null) {
+                                urlConnection.disconnect();
+                            }
+                            if (reader != null) {
+                                try {
+                                    reader.close();
+                                } catch (final IOException e) {
+                                    Log.e(LOG_TAG, "Error closing stream", e);
+                                }
+                            }
+                        }
+                        try {
+                            return getMovieDataFromJson(movieDataStr, params[1]);
+                        } catch (JSONException e) {
+                            Log.e(LOG_TAG, e.getMessage(), e);
+                            e.printStackTrace();
+                        }
+                        return null;
                     }
-                    });
-            } } else {
-                errorWhileRetrieving();
-            }
+                    @Override
+                    protected void onPostExecute(List<String> result) {
+                        if (result != null) {
+                            setGridView();
+                        }
+                    }
+                }
         }
-    }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-    }
-}
 
 
 
