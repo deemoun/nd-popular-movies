@@ -1,19 +1,31 @@
 package dyarygin.com.popularmovies;
 
-public class Movie {
-    private long id;
+import io.realm.RealmObject;
+
+public class Movie extends RealmObject {
+    private String movieId;
     private String movieOriginalTitle;
     private String posterImage;
     private String voteAverage;
     private String movieReleaseDate;
     private String movieOverview;
+    private boolean isFavorite;
 
-    public long getId() {
-        return id;
+    public boolean isFavorite() {
+        return isFavorite;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setIsFavorite(boolean isFavorite) {
+        this.isFavorite = isFavorite;
+    }
+
+
+    public String getMovieId() {
+        return movieId;
+    }
+
+    public void setMovieId(String id) {
+        this.movieId = id;
     }
 
     public String getMovieOriginalTitle() {
@@ -28,7 +40,7 @@ public class Movie {
         return posterImage;
     }
 
-    public void setPosterImageView(String posterImageView) {
+    public void setPosterImage(String posterImageView) {
         this.posterImage = posterImageView;
     }
 

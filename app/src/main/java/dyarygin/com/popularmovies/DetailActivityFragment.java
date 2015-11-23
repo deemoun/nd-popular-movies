@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.ButterKnife;
+import io.realm.Realm;
 
 public class DetailActivityFragment extends Fragment {
 
@@ -196,13 +197,21 @@ public class DetailActivityFragment extends Fragment {
         }
 
         //Creating DataSource object and adding it to database
-        dataSource = new MoviesDataSource(getContext());
-        dataSource.open();
+//        dataSource = new MoviesDataSource(getContext());
+//        dataSource.open();
+
+        final Realm realm = Realm.getInstance(detailActivity.getApplicationContext());
+        realm.beginTransaction();
+        final Movie movieModel = realm.createObject(Movie.class);
 
         favoriteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dataSource.createMovie(detailActivity.getOriginalTitle());
+//                dataSource.createMovie(detailActivity.getOriginalTitle());
+                movieModel.setMovieId(detailActivity.getMovieId());
+                movieModel.setIsFavorite(true);
+                realm.commitTransaction();
+
             }
         });
 
@@ -231,7 +240,7 @@ public class DetailActivityFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        dataSource.close();
+//        dataSource.close();
         movieTrailerList.clear();
     }
 

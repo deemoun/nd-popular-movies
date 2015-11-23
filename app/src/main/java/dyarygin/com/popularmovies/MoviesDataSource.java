@@ -43,7 +43,7 @@ public class MoviesDataSource {
     }
 
     public void deleteMovie(Movie movie) {
-        long id = movie.getId();
+        String id = movie.getMovieId();
         System.out.println("Movie deleted with id: " + id);
         database.delete(MySQLHelper.TABLE_MOVIES, MySQLHelper.COLUMN_ID
                 + " = " + id, null);
@@ -68,7 +68,7 @@ public class MoviesDataSource {
 
     private Movie cursorToMovie(Cursor cursor) {
         Movie movie = new Movie();
-        movie.setId(cursor.getLong(0));
+        movie.setMovieId(cursor.getString(0));
         movie.setMovieOriginalTitle(cursor.getString(1));
         return movie;
     }

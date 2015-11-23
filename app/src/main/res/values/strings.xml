@@ -12,4 +12,6 @@
     <string name="overview">Synopsis</string>
     <string name="no_movie_overview">No movie overview</string>
     <string name="title">Title</string>
+    <!--Preference keys -->
+    <string name="pref_key_sort_order" translatable="false">sortOrder</string>
 </resources>

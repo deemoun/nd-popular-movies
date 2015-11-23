@@ -1,7 +1,9 @@
 package dyarygin.com.popularmovies;
 
 import android.app.Fragment;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -56,7 +58,6 @@ public class MainActivityFragment extends Fragment {
     public static List<String> movieVoteAverage = new ArrayList<>();
     public static List<String> movieReleaseDate = new ArrayList<>();
 
-    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
@@ -88,10 +89,14 @@ public class MainActivityFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v =  inflater.inflate(R.layout.fragment_main, container, false);
+        final MainActivity mainActivity = (MainActivity) getActivity();
         setRetainInstance(true);
         Toolbar toolbar = (Toolbar) v.findViewById(R.id.toolbar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-        updateMovies("popularity.desc", IMAGE_FORMAT);
+        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        // Getting current sort value from SharedPreference
+        String sortOrderValue = sharedPref.getString(getString(R.string.pref_key_sort_order), "popularity.desc");
+        updateMovies(sortOrderValue, IMAGE_FORMAT);
         return v;
     }
 
@@ -117,6 +122,11 @@ public class MainActivityFragment extends Fragment {
         movieVoteAverage.clear();
         movieReleaseDate.clear();
         movieOverviewList.clear();
+        // Writing current value to Share Pref
+        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(getString(R.string.pref_key_sort_order), sortOrder);
+        editor.commit();
         FetchMovieTask fetchMovieTask = new FetchMovieTask();
         fetchMovieTask.execute(sortOrder, imgSize);
     }
@@ -299,8 +309,3 @@ public class MainActivityFragment extends Fragment {
                     }
                 }
         }
-
-
-
-
-
