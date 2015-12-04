@@ -33,6 +33,7 @@ import io.realm.Realm;
 
 public class DetailActivityFragment extends Fragment {
 
+    private static Realm mRealm;
     private Context context;
     private MoviesDataSource dataSource;
 
@@ -45,7 +46,7 @@ public class DetailActivityFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-
+        mRealm = Realm.getInstance(getActivity().getApplicationContext());
         Log.v("onCreate", "Executing AsyncTask");
         FetchTrailerTask ft = new FetchTrailerTask();
         ft.execute();
@@ -165,6 +166,22 @@ public class DetailActivityFragment extends Fragment {
         }
     }
 
+    boolean checkIfMovIsFav(String favMovie) {
+        try {
+            String result = mRealm.where(Movie.class).equalTo("movieId", favMovie).findAll().first().toString();
+            System.out.println("FAVORITE MOVIE RESULT IS: " + result);
+            if(result != null){
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception ex){
+            ex.getStackTrace();
+            System.out.println("DATABASE IS EMPTY!");
+            return false;
+        }
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -180,12 +197,14 @@ public class DetailActivityFragment extends Fragment {
 
         // Setting up the views from intent
         final DetailActivity detailActivity = (DetailActivity) getActivity();
-        String posterImage = detailActivity.getMovieImage();
-        String movieBackdropPath = detailActivity.getMovieBackdropPath();
-        String voteAverage = detailActivity.getVoteAverage();
-        String releaseDate = detailActivity.getReleaseDate();
-        String overview = detailActivity.getMovieOverview();
-        String title = detailActivity.getOriginalTitle();
+        final String movieId = detailActivity.getMovieId();
+        final String posterImage = detailActivity.getMovieImage();
+        final String movieBackdropPath = detailActivity.getMovieBackdropPath();
+        final String voteAverage = detailActivity.getVoteAverage();
+        final String releaseDate = detailActivity.getReleaseDate();
+        final String overview = detailActivity.getMovieOverview();
+        final String title = detailActivity.getOriginalTitle();
+
 
         movieOriginalTitleTextView.setText(title);
         voteAverageTextView.setText(voteAverage);
@@ -200,18 +219,25 @@ public class DetailActivityFragment extends Fragment {
 //        dataSource = new MoviesDataSource(getContext());
 //        dataSource.open();
 
-        final Realm realm = Realm.getInstance(detailActivity.getApplicationContext());
-        realm.beginTransaction();
-        final Movie movieModel = realm.createObject(Movie.class);
-
         favoriteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 //                dataSource.createMovie(detailActivity.getOriginalTitle());
-                movieModel.setMovieId(detailActivity.getMovieId());
-                movieModel.setIsFavorite(true);
-                realm.commitTransaction();
-
+        mRealm.beginTransaction();
+        Movie movieModel = new Movie();
+        movieModel.setMovieId(movieId);
+        movieModel.setMovieOriginalTitle(title);
+        movieModel.setPosterImage(posterImage);
+        movieModel.setVoteAverage(voteAverage);
+        movieModel.setMovieReleaseDate(releaseDate);
+        movieModel.setMovieOverview(overview);
+        if (checkIfMovIsFav(movieId)){
+        movieModel.setIsFavorite(false);
+        } else {
+        movieModel.setIsFavorite(true);
+        }
+        mRealm.copyToRealmOrUpdate(movieModel);
+        mRealm.commitTransaction();
             }
         });
 
@@ -242,11 +268,13 @@ public class DetailActivityFragment extends Fragment {
         super.onPause();
 //        dataSource.close();
         movieTrailerList.clear();
+        mRealm.close();
     }
 
     @Override
     public  void onStop(){
         super.onStop();
         movieTrailerList.clear();
+        mRealm.close();
     }
 }
