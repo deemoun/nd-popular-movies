@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -30,6 +31,7 @@ import java.util.List;
 
 import butterknife.ButterKnife;
 import io.realm.Realm;
+import io.realm.RealmResults;
 
 public class DetailActivityFragment extends Fragment {
 
@@ -47,6 +49,7 @@ public class DetailActivityFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         mRealm = Realm.getInstance(getActivity().getApplicationContext());
+        context = getActivity().getApplicationContext();
         Log.v("onCreate", "Executing AsyncTask");
         FetchTrailerTask ft = new FetchTrailerTask();
         ft.execute();
@@ -168,16 +171,16 @@ public class DetailActivityFragment extends Fragment {
 
     boolean checkIfMovIsFav(String favMovie) {
         try {
-            String result = mRealm.where(Movie.class).equalTo("movieId", favMovie).findAll().first().toString();
-            System.out.println("FAVORITE MOVIE RESULT IS: " + result);
-            if(result != null){
+            RealmResults<Movie> favResults = mRealm.where(Movie.class)
+                    .equalTo("movieId", favMovie)
+                    .findAll();
+            if(favResults.get(0).isFavorite()){
                 return true;
             } else {
                 return false;
             }
         } catch (Exception ex){
             ex.getStackTrace();
-            System.out.println("DATABASE IS EMPTY!");
             return false;
         }
     }
@@ -223,7 +226,9 @@ public class DetailActivityFragment extends Fragment {
             @Override
             public void onClick(View v) {
 //                dataSource.createMovie(detailActivity.getOriginalTitle());
+        mRealm.refresh();
         mRealm.beginTransaction();
+
         Movie movieModel = new Movie();
         movieModel.setMovieId(movieId);
         movieModel.setMovieOriginalTitle(title);
@@ -232,8 +237,10 @@ public class DetailActivityFragment extends Fragment {
         movieModel.setMovieReleaseDate(releaseDate);
         movieModel.setMovieOverview(overview);
         if (checkIfMovIsFav(movieId)){
+        Toast.makeText(context, "Removed from Favorites", Toast.LENGTH_SHORT).show();
         movieModel.setIsFavorite(false);
         } else {
+        Toast.makeText(context, "Added to Favorites", Toast.LENGTH_SHORT).show();
         movieModel.setIsFavorite(true);
         }
         mRealm.copyToRealmOrUpdate(movieModel);
@@ -274,7 +281,14 @@ public class DetailActivityFragment extends Fragment {
     @Override
     public  void onStop(){
         super.onStop();
-        movieTrailerList.clear();
         mRealm.close();
+        movieTrailerList.clear();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mRealm.close();
+        movieTrailerList.clear();
     }
 }

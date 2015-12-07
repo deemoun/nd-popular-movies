@@ -33,6 +33,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.ButterKnife;
+import io.realm.Realm;
+import io.realm.RealmResults;
 
 public class MainActivityFragment extends Fragment {
 
@@ -50,16 +52,18 @@ public class MainActivityFragment extends Fragment {
     // Image size format used for the displaying images
     public final static String IMAGE_FORMAT = "w185";
 
-    public static List<String> movieIdList = new ArrayList<>();
-    public static List<String> movieImageList = new ArrayList<>();
-    public static List<String> movieBackdropPathList = new ArrayList<>();
-    public static List<String> movieOriginalTitleList = new ArrayList<>();
-    public static List<String> movieOverviewList = new ArrayList<>();
-    public static List<String> movieVoteAverage = new ArrayList<>();
-    public static List<String> movieReleaseDate = new ArrayList<>();
+    private static List<String> movieIdList = new ArrayList<>();
+    private static List<String> movieImageList = new ArrayList<>();
+    private static List<String> movieBackdropPathList = new ArrayList<>();
+    private static List<String> movieOriginalTitleList = new ArrayList<>();
+    private static List<String> movieOverviewList = new ArrayList<>();
+    private static List<String> movieVoteAverage = new ArrayList<>();
+    private static List<String> movieReleaseDate = new ArrayList<>();
+    private static Realm mRealm;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mRealm = Realm.getInstance(getActivity().getApplicationContext());
         setHasOptionsMenu(true);
     }
 
@@ -104,6 +108,12 @@ public class MainActivityFragment extends Fragment {
     public void onStart() {
         super.onStart();
     }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+    mRealm.close();
+    }
     @Override
     public void onPause() {
         super.onPause();
@@ -132,14 +142,33 @@ public class MainActivityFragment extends Fragment {
     }
 
     public void updateMovies(){
-        String[] imgArray = new String[1];
-        imgArray[0] = "http://image.tmdb.org/t/p/w185/1n9D32o30XOHMdMWuIT4AaA5ruI.jpg";
 
+        // Get the data from Realm database
+
+        mRealm.refresh();
+
+        RealmResults<Movie> results = mRealm.where(Movie.class).equalTo("isFavorite", true).findAll();
+        final String[] posterImage = new String[results.size()];
+        final String[] movieId = new String[results.size()];
+        final String[] movieOriginalTitle = new String[results.size()];
+        final String[] voteAverage = new String[results.size()];
+        final String[] movieReleaseDate = new String[results.size()];
+        final String[] movieOverview = new String[results.size()];
+
+        // Add results to an Array
+        for (int i = 0; i < results.size(); i++) {
+            posterImage[i] = results.get(i).getPosterImage();
+            movieId[i] = results.get(i).getMovieId();
+            movieOriginalTitle[i] = results.get(i).getMovieOriginalTitle();
+            voteAverage[i] = results.get(i).getVoteAverage();
+            movieReleaseDate[i] = results.get(i).getMovieReleaseDate();
+            movieOverview[i] = results.get(i).getMovieOverview();
+        }
 
         View view = getView();
         if (view != null) {
             GridView gridview = ButterKnife.findById(view, R.id.movies_grid);
-            ImageAdapter imageAdapter = new ImageAdapter(getActivity().getApplicationContext(), imgArray, 555, 834);
+            ImageAdapter imageAdapter = new ImageAdapter(getActivity().getApplicationContext(), posterImage, 555, 834);
             gridview.setAdapter(imageAdapter);
 
             // Setting onClickListener on GridView
@@ -147,28 +176,28 @@ public class MainActivityFragment extends Fragment {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // Handling of the click
+                    Intent intent = new Intent(getActivity(), DetailActivity.class);
+                    intent.putExtra(EXTRA_MOVIEIMAGE, posterImage[position]);
+                    intent.putExtra(EXTRA_MOVIEVOTE, voteAverage[position]);
+                    intent.putExtra(EXTRA_MOVIERELEASEDATE, movieReleaseDate[position]);
+                    intent.putExtra(EXTRA_MOVIEOVERVIEW, movieOverview[position]);
+                    intent.putExtra(EXTRA_MOVIEORIGINALTITLE, movieOriginalTitle[position]);
+                    intent.putExtra(EXTRA_MOVIEID, movieId[position]);
+                    startActivity(intent);
 
                 }
             });
         }
-
-
     }
 
     public void setGridView() {
         final String[] imgArray = movieImageList.toArray(new String[movieImageList.size()]);
-        System.out.println("FAKE_DATA_MOVIEIMAGE_LIST " + imgArray[1]);
         final String[] backdropPath = movieBackdropPathList.toArray(new String[movieBackdropPathList.size()]);
         final String[] voteArray = movieVoteAverage.toArray(new String[movieVoteAverage.size()]);
-        System.out.println("FAKE_DATA_MOVIE_VOTE_RATE " + voteArray[1]);
         final String[] releaseDate = movieReleaseDate.toArray(new String[movieReleaseDate.size()]);
-        System.out.println("FAKE_DATA_MOVIE_RELEASE_DATE " + releaseDate[1]);
         final String[] overview = movieOverviewList.toArray(new String[movieOverviewList.size()]);
-        System.out.println("FAKE_DATA_MOVIEOVERVIEW_LIST " + overview[1]);
         final String[] movId = movieIdList.toArray(new String[movieIdList.size()]);
-        System.out.println("FAKE_DATA_MOVIEID " + movId[1]);
         final String[] title = movieOriginalTitleList.toArray(new String[movieOriginalTitleList.size()]);
-        System.out.println("FAKE_DATA_MOVIEIMAGE_LIST " + title[1]);
 
         View view = getView();
         if (view != null) {
