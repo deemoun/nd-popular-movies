@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -99,8 +100,13 @@ public class MainActivityFragment extends Fragment {
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
         // Getting current sort value from SharedPreference
+
         String sortOrderValue = sharedPref.getString(getString(R.string.pref_key_sort_order), "popularity.desc");
-        updateMovies(sortOrderValue, IMAGE_FORMAT);
+        if(sortOrderValue.equals("favOrder")){
+            updateMovies();
+        } else {
+            updateMovies(sortOrderValue, IMAGE_FORMAT);
+        }
         return v;
     }
 
@@ -144,8 +150,11 @@ public class MainActivityFragment extends Fragment {
     public void updateMovies(){
 
         // Get the data from Realm database
-
-        mRealm.refresh();
+        mRealm = Realm.getInstance(getActivity().getApplicationContext());
+        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(getString(R.string.pref_key_sort_order), "favOrder");
+        editor.commit();
 
         RealmResults<Movie> results = mRealm.where(Movie.class).equalTo("isFavorite", true).findAll();
         final String[] posterImage = new String[results.size()];
@@ -155,42 +164,52 @@ public class MainActivityFragment extends Fragment {
         final String[] movieReleaseDate = new String[results.size()];
         final String[] movieOverview = new String[results.size()];
 
-        // Add results to an Array
-        for (int i = 0; i < results.size(); i++) {
-            posterImage[i] = results.get(i).getPosterImage();
-            movieId[i] = results.get(i).getMovieId();
-            movieOriginalTitle[i] = results.get(i).getMovieOriginalTitle();
-            voteAverage[i] = results.get(i).getVoteAverage();
-            movieReleaseDate[i] = results.get(i).getMovieReleaseDate();
-            movieOverview[i] = results.get(i).getMovieOverview();
-        }
+        if(results.size() != 0) {
+            // Add results to an Array
+            for (int i = 0; i < results.size(); i++) {
+                posterImage[i] = results.get(i).getPosterImage();
+                movieId[i] = results.get(i).getMovieId();
+                movieOriginalTitle[i] = results.get(i).getMovieOriginalTitle();
+                voteAverage[i] = results.get(i).getVoteAverage();
+                movieReleaseDate[i] = results.get(i).getMovieReleaseDate();
+                movieOverview[i] = results.get(i).getMovieOverview();
+            }
 
-        View view = getView();
-        if (view != null) {
-            GridView gridview = ButterKnife.findById(view, R.id.movies_grid);
-            ImageAdapter imageAdapter = new ImageAdapter(getActivity().getApplicationContext(), posterImage, 555, 834);
-            gridview.setAdapter(imageAdapter);
+            View view = getView();
+            if (view != null) {
+                GridView gridview = ButterKnife.findById(view, R.id.movies_grid);
+                ImageAdapter imageAdapter = new ImageAdapter(getActivity().getApplicationContext(), posterImage, 555, 834);
+                gridview.setAdapter(imageAdapter);
 
-            // Setting onClickListener on GridView
-            gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // Handling of the click
-                    Intent intent = new Intent(getActivity(), DetailActivity.class);
-                    intent.putExtra(EXTRA_MOVIEIMAGE, posterImage[position]);
-                    intent.putExtra(EXTRA_MOVIEVOTE, voteAverage[position]);
-                    intent.putExtra(EXTRA_MOVIERELEASEDATE, movieReleaseDate[position]);
-                    intent.putExtra(EXTRA_MOVIEOVERVIEW, movieOverview[position]);
-                    intent.putExtra(EXTRA_MOVIEORIGINALTITLE, movieOriginalTitle[position]);
-                    intent.putExtra(EXTRA_MOVIEID, movieId[position]);
-                    startActivity(intent);
-
-                }
-            });
+                // Setting onClickListener on GridView
+                gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        // Handling of the click
+                        Intent intent = new Intent(getActivity(), DetailActivity.class);
+                        intent.putExtra(EXTRA_MOVIEIMAGE, posterImage[position]);
+                        intent.putExtra(EXTRA_MOVIEVOTE, voteAverage[position]);
+                        intent.putExtra(EXTRA_MOVIERELEASEDATE, movieReleaseDate[position]);
+                        intent.putExtra(EXTRA_MOVIEOVERVIEW, movieOverview[position]);
+                        intent.putExtra(EXTRA_MOVIEORIGINALTITLE, movieOriginalTitle[position]);
+                        intent.putExtra(EXTRA_MOVIEID, movieId[position]);
+                        startActivity(intent);
+                    }
+                });
+            }
+        } else {
+            Toast.makeText(getActivity().getApplicationContext(), "No favorite movies yet!", Toast.LENGTH_SHORT).show();
         }
     }
 
     public void setGridView() {
+        mRealm = Realm.getInstance(getActivity().getApplicationContext());
+        RealmResults<Movie> results = mRealm.where(Movie.class).findAll();
+        final String[] posterImage = new String[results.size()];
+
+        for (int i = 0; i < results.size(); i++){
+            posterImage[i] = results.get(i).getPosterImage();
+        }
         final String[] imgArray = movieImageList.toArray(new String[movieImageList.size()]);
         final String[] backdropPath = movieBackdropPathList.toArray(new String[movieBackdropPathList.size()]);
         final String[] voteArray = movieVoteAverage.toArray(new String[movieVoteAverage.size()]);
@@ -202,7 +221,7 @@ public class MainActivityFragment extends Fragment {
         View view = getView();
         if (view != null) {
             GridView gridview = ButterKnife.findById(view, R.id.movies_grid);
-            ImageAdapter imageAdapter = new ImageAdapter(getActivity().getApplicationContext(), imgArray, 555, 834);
+            ImageAdapter imageAdapter = new ImageAdapter(getActivity().getApplicationContext(), posterImage, 555, 834);
             gridview.setAdapter(imageAdapter);
 
             // Setting onClickListener on GridView
@@ -237,9 +256,20 @@ public class MainActivityFragment extends Fragment {
                         // Base Url for the TMDB images
                         final String ImageBaseUrl = "http://image.tmdb.org/t/p/" + imageSize;
 
-
                         for (int i = 0; i < movieArray.length(); i++) {
                             JSONObject movieTitle = movieArray.getJSONObject(i);
+                            mRealm = Realm.getInstance(getActivity().getApplicationContext());
+
+                            mRealm.beginTransaction();
+                            Movie movieDB = new Movie();
+                            movieDB.setMovieId(movieTitle.getString("id"));
+                            movieDB.setPosterImage(ImageBaseUrl + movieTitle.getString("poster_path"));
+                            movieDB.setMovieOriginalTitle(movieTitle.getString("original_title"));
+                            movieDB.setMovieOverview(movieTitle.getString("overview"));
+                            movieDB.setVoteAverage(movieTitle.getString("vote_average"));
+                            movieDB.setMovieReleaseDate(movieTitle.getString("release_date"));
+                            mRealm.copyToRealmOrUpdate(movieDB);
+                            mRealm.commitTransaction();
 
                             movieIdList.add(movieTitle.getString("id"));
                             movieImageList.add(ImageBaseUrl + movieTitle.getString("poster_path"));

@@ -37,7 +37,6 @@ public class DetailActivityFragment extends Fragment {
 
     private static Realm mRealm;
     private Context context;
-    private MoviesDataSource dataSource;
 
     public DetailActivityFragment() {
     }
@@ -218,14 +217,9 @@ public class DetailActivityFragment extends Fragment {
             movieOverviewTextView.setText(overview);
         }
 
-        //Creating DataSource object and adding it to database
-//        dataSource = new MoviesDataSource(getContext());
-//        dataSource.open();
-
         favoriteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                dataSource.createMovie(detailActivity.getOriginalTitle());
         mRealm.refresh();
         mRealm.beginTransaction();
 
@@ -273,7 +267,6 @@ public class DetailActivityFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-//        dataSource.close();
         movieTrailerList.clear();
         mRealm.close();
     }
