@@ -4,6 +4,8 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -39,32 +41,47 @@ import io.realm.RealmResults;
 
 public class MainActivityFragment extends Fragment {
 
+    private static Realm mRealm;
+
     public MainActivityFragment() {
     }
 
-    public final static String EXTRA_MOVIEID = "dyarygin.com.popularmovies.MOVIEID";
-    public final static String EXTRA_MOVIEIMAGE = "dyarygin.com.popularmovies.MOVIEIMAGE";
-    public final static String EXTRA_MOVIEBACKDROPPATH = "dyarygin.com.popularmovies.MOVIEBACKDROPPATH";
-    public final static String EXTRA_MOVIEVOTE = "dyarygin.com.popularmovies.MOVIEVOTE";
-    public final static String EXTRA_MOVIERELEASEDATE = "dyarygin.com.popularmovies.MOVIERELEASEDATE";
-    public final static String EXTRA_MOVIEORIGINALTITLE = "dyarygin.com.popularmovies.MOVIEORIGINALTITLE";
-    public final static String EXTRA_MOVIEOVERVIEW = "dyarygin.com.popularmovies.MOVIEOVERVIEW";
+    public Realm getRealmInstance(){
+        return mRealm = Realm.getInstance(getActivity().getApplicationContext());
+    }
+
+    public String getSortOrderSharedPrefs(){
+        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        return sharedPref.getString(getString(R.string.pref_key_sort_order), "popularity.desc");
+    }
+
+    public void setSortOrderSharedPrefs(String sortOrder) {
+        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(getString(R.string.pref_key_sort_order), sortOrder);
+        editor.commit();
+    }
+
+    public boolean isOnline() {
+        ConnectivityManager conMgr = (ConnectivityManager) getActivity()
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = conMgr.getActiveNetworkInfo();
+
+        if (netInfo == null || !netInfo.isConnected() || !netInfo.isAvailable()) {
+            /*
+             * Toast.makeText(getActivity(), "No Internet connection!",
+             * Toast.LENGTH_LONG).show();
+             */
+            return false;
+        }
+        return true;
+    }
 
     // Image size format used for the displaying images
     public final static String IMAGE_FORMAT = "w185";
 
-    private static List<String> movieIdList = new ArrayList<>();
-    private static List<String> movieImageList = new ArrayList<>();
-    private static List<String> movieBackdropPathList = new ArrayList<>();
-    private static List<String> movieOriginalTitleList = new ArrayList<>();
-    private static List<String> movieOverviewList = new ArrayList<>();
-    private static List<String> movieVoteAverage = new ArrayList<>();
-    private static List<String> movieReleaseDate = new ArrayList<>();
-    private static Realm mRealm;
-
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRealm = Realm.getInstance(getActivity().getApplicationContext());
         setHasOptionsMenu(true);
     }
 
@@ -98,10 +115,10 @@ public class MainActivityFragment extends Fragment {
         setRetainInstance(true);
         Toolbar toolbar = (Toolbar) v.findViewById(R.id.toolbar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+
         // Getting current sort value from SharedPreference
 
-        String sortOrderValue = sharedPref.getString(getString(R.string.pref_key_sort_order), "popularity.desc");
+        String sortOrderValue = getSortOrderSharedPrefs();
         if(sortOrderValue.equals("favOrder")){
             updateMovies();
         } else {
@@ -131,48 +148,29 @@ public class MainActivityFragment extends Fragment {
     }
 
     public void updateMovies(String sortOrder, String imgSize){
-        movieIdList.clear();
-        movieImageList.clear();
-        movieBackdropPathList.clear();
-        movieOriginalTitleList.clear();
-        movieVoteAverage.clear();
-        movieReleaseDate.clear();
-        movieOverviewList.clear();
         // Writing current value to Share Pref
-        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(getString(R.string.pref_key_sort_order), sortOrder);
-        editor.commit();
-        FetchMovieTask fetchMovieTask = new FetchMovieTask();
-        fetchMovieTask.execute(sortOrder, imgSize);
+        setSortOrderSharedPrefs(sortOrder);
+            FetchMovieTask fetchMovieTask = new FetchMovieTask();
+            fetchMovieTask.execute(sortOrder, imgSize);
     }
 
     public void updateMovies(){
 
         // Get the data from Realm database
-        mRealm = Realm.getInstance(getActivity().getApplicationContext());
-        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(getString(R.string.pref_key_sort_order), "favOrder");
-        editor.commit();
+        getRealmInstance();
+        setSortOrderSharedPrefs("favOrder");
 
-        RealmResults<Movie> results = mRealm.where(Movie.class).equalTo("isFavorite", true).findAll();
+        RealmResults<Movie> results = mRealm.where(Movie.class)
+                .equalTo("isFavorite", true)
+                .findAll();
         final String[] posterImage = new String[results.size()];
         final String[] movieId = new String[results.size()];
-        final String[] movieOriginalTitle = new String[results.size()];
-        final String[] voteAverage = new String[results.size()];
-        final String[] movieReleaseDate = new String[results.size()];
-        final String[] movieOverview = new String[results.size()];
 
         if(results.size() != 0) {
             // Add results to an Array
             for (int i = 0; i < results.size(); i++) {
                 posterImage[i] = results.get(i).getPosterImage();
                 movieId[i] = results.get(i).getMovieId();
-                movieOriginalTitle[i] = results.get(i).getMovieOriginalTitle();
-                voteAverage[i] = results.get(i).getVoteAverage();
-                movieReleaseDate[i] = results.get(i).getMovieReleaseDate();
-                movieOverview[i] = results.get(i).getMovieOverview();
             }
 
             View view = getView();
@@ -187,12 +185,7 @@ public class MainActivityFragment extends Fragment {
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         // Handling of the click
                         Intent intent = new Intent(getActivity(), DetailActivity.class);
-                        intent.putExtra(EXTRA_MOVIEIMAGE, posterImage[position]);
-                        intent.putExtra(EXTRA_MOVIEVOTE, voteAverage[position]);
-                        intent.putExtra(EXTRA_MOVIERELEASEDATE, movieReleaseDate[position]);
-                        intent.putExtra(EXTRA_MOVIEOVERVIEW, movieOverview[position]);
-                        intent.putExtra(EXTRA_MOVIEORIGINALTITLE, movieOriginalTitle[position]);
-                        intent.putExtra(EXTRA_MOVIEID, movieId[position]);
+                        intent.putExtra(Config.EXTRA_MOVIEID, movieId[position]);
                         startActivity(intent);
                     }
                 });
@@ -203,20 +196,17 @@ public class MainActivityFragment extends Fragment {
     }
 
     public void setGridView() {
-        mRealm = Realm.getInstance(getActivity().getApplicationContext());
-        RealmResults<Movie> results = mRealm.where(Movie.class).findAll();
+        getRealmInstance();
+        RealmResults<Movie> results = mRealm.where(Movie.class)
+                .equalTo("sortOrder", getSortOrderSharedPrefs())
+                .findAll();
         final String[] posterImage = new String[results.size()];
+        final String[] movieId = new String[results.size()];
 
         for (int i = 0; i < results.size(); i++){
             posterImage[i] = results.get(i).getPosterImage();
+            movieId[i] = results.get(i).getMovieId();
         }
-        final String[] imgArray = movieImageList.toArray(new String[movieImageList.size()]);
-        final String[] backdropPath = movieBackdropPathList.toArray(new String[movieBackdropPathList.size()]);
-        final String[] voteArray = movieVoteAverage.toArray(new String[movieVoteAverage.size()]);
-        final String[] releaseDate = movieReleaseDate.toArray(new String[movieReleaseDate.size()]);
-        final String[] overview = movieOverviewList.toArray(new String[movieOverviewList.size()]);
-        final String[] movId = movieIdList.toArray(new String[movieIdList.size()]);
-        final String[] title = movieOriginalTitleList.toArray(new String[movieOriginalTitleList.size()]);
 
         View view = getView();
         if (view != null) {
@@ -229,13 +219,7 @@ public class MainActivityFragment extends Fragment {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     Intent intent = new Intent(getActivity(), DetailActivity.class);
-                    intent.putExtra(EXTRA_MOVIEIMAGE, imgArray[position]);
-                    intent.putExtra(EXTRA_MOVIEBACKDROPPATH, backdropPath[position]);
-                    intent.putExtra(EXTRA_MOVIEVOTE, voteArray[position]);
-                    intent.putExtra(EXTRA_MOVIERELEASEDATE, releaseDate[position]);
-                    intent.putExtra(EXTRA_MOVIEOVERVIEW, overview[position]);
-                    intent.putExtra(EXTRA_MOVIEORIGINALTITLE, title[position]);
-                    intent.putExtra(EXTRA_MOVIEID, movId[position]);
+                    intent.putExtra(Config.EXTRA_MOVIEID, movieId[position]);
                     startActivity(intent);
 
                 }
@@ -249,16 +233,18 @@ public class MainActivityFragment extends Fragment {
 
                     private List<String> getMovieDataFromJson(String movieJsonStr, String imageSize) throws JSONException {
                         // Getting the root "results" array
+                        getRealmInstance();
                         JSONObject movieObject = new JSONObject(movieJsonStr);
 
                         JSONArray movieArray = movieObject.getJSONArray("results");
 
                         // Base Url for the TMDB images
                         final String ImageBaseUrl = "http://image.tmdb.org/t/p/" + imageSize;
+                        List<String> movieIdList = new ArrayList<>();
+                        movieIdList.add("Test");
 
                         for (int i = 0; i < movieArray.length(); i++) {
                             JSONObject movieTitle = movieArray.getJSONObject(i);
-                            mRealm = Realm.getInstance(getActivity().getApplicationContext());
 
                             mRealm.beginTransaction();
                             Movie movieDB = new Movie();
@@ -268,18 +254,12 @@ public class MainActivityFragment extends Fragment {
                             movieDB.setMovieOverview(movieTitle.getString("overview"));
                             movieDB.setVoteAverage(movieTitle.getString("vote_average"));
                             movieDB.setMovieReleaseDate(movieTitle.getString("release_date"));
+                            movieDB.setSortOrder(getSortOrderSharedPrefs());
                             mRealm.copyToRealmOrUpdate(movieDB);
                             mRealm.commitTransaction();
-
-                            movieIdList.add(movieTitle.getString("id"));
-                            movieImageList.add(ImageBaseUrl + movieTitle.getString("poster_path"));
-                            movieBackdropPathList.add(ImageBaseUrl + movieTitle.getString("backdrop_path"));
-                            movieOriginalTitleList.add(movieTitle.getString("original_title"));
-                            movieOverviewList.add(movieTitle.getString("overview"));
-                            movieVoteAverage.add(movieTitle.getString("vote_average"));
-                            movieReleaseDate.add(movieTitle.getString("release_date"));
                         }
-                        return movieImageList;
+                        //TODO: Remove the return type dependency
+                        return movieIdList;
                     }
 
                     @Override
@@ -362,9 +342,8 @@ public class MainActivityFragment extends Fragment {
                     }
                     @Override
                     protected void onPostExecute(List<String> result) {
-                        if (result != null) {
+                            Utils.Logger("Setting Grid View");
                             setGridView();
-                        }
                     }
                 }
         }

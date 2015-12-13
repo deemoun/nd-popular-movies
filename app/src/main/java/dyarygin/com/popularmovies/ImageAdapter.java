@@ -52,8 +52,6 @@ public class ImageAdapter extends BaseAdapter {
                 .centerCrop()
                 .into(imageView);
         imageView.setAdjustViewBounds(true);
-
         return imageView;
-
     }
 }

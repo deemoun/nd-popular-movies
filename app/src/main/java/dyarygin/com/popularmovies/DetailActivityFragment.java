@@ -12,7 +12,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -47,11 +46,10 @@ public class DetailActivityFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-        mRealm = Realm.getInstance(getActivity().getApplicationContext());
         context = getActivity().getApplicationContext();
         Log.v("onCreate", "Executing AsyncTask");
-        FetchTrailerTask ft = new FetchTrailerTask();
-        ft.execute();
+//        FetchTrailerTask ft = new FetchTrailerTask();
+//        ft.execute();
     }
 
     // Adding FetchTrailerTask
@@ -66,7 +64,7 @@ public class DetailActivityFragment extends Fragment {
 
             JSONArray trailerArray = trailerObject.getJSONArray("results");
 
-            // Base Url for the Trailers
+            // Base Url for the TrailersInfo
             final String YoutubeBaseUrl = "https://www.youtube.com/watch?v=";
 
 
@@ -168,45 +166,34 @@ public class DetailActivityFragment extends Fragment {
         }
     }
 
-    boolean checkIfMovIsFav(String favMovie) {
-        try {
-            RealmResults<Movie> favResults = mRealm.where(Movie.class)
-                    .equalTo("movieId", favMovie)
-                    .findAll();
-            if(favResults.get(0).isFavorite()){
-                return true;
-            } else {
-                return false;
-            }
-        } catch (Exception ex){
-            ex.getStackTrace();
-            return false;
-        }
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
+
+        mRealm = Realm.getInstance(getActivity().getApplicationContext());
 
         // Finding views
         TextView movieOriginalTitleTextView = ButterKnife.findById(view, R.id.movieOriginalTitleTextView);
         ImageView posterImageView = ButterKnife.findById(view, R.id.posterImageView);
         TextView voteAverageTextView = ButterKnife.findById(view, R.id.voteAverageTextView);
         TextView movieReleaseDateTextView = ButterKnife.findById(view, R.id.movieReleaseDateTextView);
-        TextView movieOverviewTextView = ButterKnife.findById(view,R.id.movieOverviewTextView);
+        TextView movieOverviewTextView = ButterKnife.findById(view, R.id.movieOverviewTextView);
         Button favoriteButton = ButterKnife.findById(view, R.id.favoriteButton);
 
         // Setting up the views from intent
+
         final DetailActivity detailActivity = (DetailActivity) getActivity();
         final String movieId = detailActivity.getMovieId();
-        final String posterImage = detailActivity.getMovieImage();
-        final String movieBackdropPath = detailActivity.getMovieBackdropPath();
-        final String voteAverage = detailActivity.getVoteAverage();
-        final String releaseDate = detailActivity.getReleaseDate();
-        final String overview = detailActivity.getMovieOverview();
-        final String title = detailActivity.getOriginalTitle();
 
+//         Getting data from Realm
+        final RealmResults<Movie> results = mRealm.where(Movie.class).equalTo("movieId", movieId).findAll();
+
+        final String posterImage = results.get(0).getPosterImage();
+        final String voteAverage = results.get(0).getVoteAverage();
+        final String releaseDate = results.get(0).getMovieReleaseDate();
+        final String overview = results.get(0).getMovieOverview();
+        final String title = results.get(0).getMovieOriginalTitle();
 
         movieOriginalTitleTextView.setText(title);
         voteAverageTextView.setText(voteAverage);
@@ -220,26 +207,47 @@ public class DetailActivityFragment extends Fragment {
         favoriteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-        mRealm.refresh();
-        mRealm.beginTransaction();
+                mRealm = Realm.getInstance(getActivity().getApplicationContext());
+                Favorites favModel = new Favorites();
+                RealmResults<Favorites> resultsFav = mRealm.where(Favorites.class)
+                        .equalTo("movieId", movieId)
+                        .findAll();
+                String[] resultsArray = new String[resultsFav.size()];
+                mRealm.beginTransaction();
+                if(resultsFav.get(0).getIsFavorite()){
+                    favModel.setIsFavorite(false);
+                } else {
+                    favModel.setMovieId(movieId);
+                    favModel.setIsFavorite(true);
+                }
+                mRealm.copyToRealm(favModel);
+                mRealm.commitTransaction();
 
-        Movie movieModel = new Movie();
-        movieModel.setMovieId(movieId);
-        movieModel.setMovieOriginalTitle(title);
-        movieModel.setPosterImage(posterImage);
-        movieModel.setVoteAverage(voteAverage);
-        movieModel.setMovieReleaseDate(releaseDate);
-        movieModel.setMovieOverview(overview);
-        if (checkIfMovIsFav(movieId)){
-        Toast.makeText(context, "Removed from Favorites", Toast.LENGTH_SHORT).show();
-        movieModel.setIsFavorite(false);
-        } else {
-        Toast.makeText(context, "Added to Favorites", Toast.LENGTH_SHORT).show();
-        movieModel.setIsFavorite(true);
-        }
-        mRealm.copyToRealmOrUpdate(movieModel);
-        mRealm.commitTransaction();
-            }
+//                for(int i = 0; i < resultsFav.size(); i++){
+//                    resultsArray[i] = resultsFav.get(i).getMovieId();
+//                }
+//
+//                if (resultsArray.equals(null)){
+//
+//                }
+//                if(resultsFav.get(0).getMovieId() != null){
+//                    mRealm.beginTransaction();
+//                    if (resultsFav.get(0).getIsFavorite()) {
+//                        Toast.makeText(context, "Removed from Favorites", Toast.LENGTH_SHORT).show();
+//                        favModel.setIsFavorite(false);
+//                    } else {
+//                        Toast.makeText(context, "Added to Favorites", Toast.LENGTH_SHORT).show();
+//                        favModel.setIsFavorite(true);
+//                    }
+//                    mRealm.copyToRealmOrUpdate(favModel);
+//                    mRealm.commitTransaction();
+//                } else {
+//                    mRealm.beginTransaction();
+//                    favModel.setMovieId(movieId);
+//                    favModel.setIsFavorite(true);
+//                    mRealm.commitTransaction();
+//                }
+              }
         });
 
             Picasso.with(context)
@@ -252,7 +260,6 @@ public class DetailActivityFragment extends Fragment {
         return view;
 
     }
-
 
     @Override
     public void onStart() {

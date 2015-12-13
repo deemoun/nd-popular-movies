@@ -11,16 +11,15 @@ public class Movie extends RealmObject {
     private String voteAverage;
     private String movieReleaseDate;
     private String movieOverview;
-    private boolean isFavorite;
+    private String sortOrder;
 
-    public boolean isFavorite() {
-        return isFavorite;
+    public String getSortOrder() {
+        return sortOrder;
     }
 
-    public void setIsFavorite(boolean isFavorite) {
-        this.isFavorite = isFavorite;
+    public void setSortOrder(String sortOrder) {
+        this.sortOrder = sortOrder;
     }
-
 
     public String getMovieId() {
         return movieId;
@@ -69,5 +68,4 @@ public class Movie extends RealmObject {
     public void setMovieOverview(String movieOverview) {
         this.movieOverview = movieOverview;
     }
-
 }
