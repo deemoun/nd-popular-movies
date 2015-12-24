@@ -32,18 +32,23 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.ButterKnife;
 import io.realm.Realm;
 import io.realm.RealmResults;
+import io.realm.exceptions.RealmPrimaryKeyConstraintException;
 
 public class MainActivityFragment extends Fragment {
 
     private static Realm mRealm;
+    private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
+    private static View view;
 
     public MainActivityFragment() {
+    }
+
+    public View getCurrentView(){
+        return view = getView();
     }
 
     public Realm getRealmInstance(){
@@ -119,11 +124,7 @@ public class MainActivityFragment extends Fragment {
         // Getting current sort value from SharedPreference
 
         String sortOrderValue = getSortOrderSharedPrefs();
-        if(sortOrderValue.equals("favOrder")){
-            updateMovies();
-        } else {
             updateMovies(sortOrderValue, IMAGE_FORMAT);
-        }
         return v;
     }
 
@@ -135,7 +136,6 @@ public class MainActivityFragment extends Fragment {
     @Override
     public void onDestroy(){
         super.onDestroy();
-    mRealm.close();
     }
     @Override
     public void onPause() {
@@ -150,15 +150,14 @@ public class MainActivityFragment extends Fragment {
     public void updateMovies(String sortOrder, String imgSize){
         // Writing current value to Share Pref
         setSortOrderSharedPrefs(sortOrder);
-            FetchMovieTask fetchMovieTask = new FetchMovieTask();
-            fetchMovieTask.execute(sortOrder, imgSize);
+        FetchMovieTask fetchMovieTask = new FetchMovieTask();
+        fetchMovieTask.execute(sortOrder, imgSize);
     }
 
     public void updateMovies(){
 
         // Get the data from Realm database
         getRealmInstance();
-        setSortOrderSharedPrefs("favOrder");
 
         RealmResults<Movie> results = mRealm.where(Movie.class)
                 .equalTo("isFavorite", true)
@@ -173,8 +172,7 @@ public class MainActivityFragment extends Fragment {
                 movieId[i] = results.get(i).getMovieId();
             }
 
-            View view = getView();
-            if (view != null) {
+            if (getCurrentView() != null) {
                 GridView gridview = ButterKnife.findById(view, R.id.movies_grid);
                 ImageAdapter imageAdapter = new ImageAdapter(getActivity().getApplicationContext(), posterImage, 555, 834);
                 gridview.setAdapter(imageAdapter);
@@ -208,8 +206,7 @@ public class MainActivityFragment extends Fragment {
             movieId[i] = results.get(i).getMovieId();
         }
 
-        View view = getView();
-        if (view != null) {
+        if (getCurrentView() != null) {
             GridView gridview = ButterKnife.findById(view, R.id.movies_grid);
             ImageAdapter imageAdapter = new ImageAdapter(getActivity().getApplicationContext(), posterImage, 555, 834);
             gridview.setAdapter(imageAdapter);
@@ -227,11 +224,9 @@ public class MainActivityFragment extends Fragment {
         }
     }
 
-                public class FetchMovieTask extends AsyncTask<String, Void, List<String>> {
+                public class FetchMovieTask extends AsyncTask<String, Void, String> {
 
-                    private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
-
-                    private List<String> getMovieDataFromJson(String movieJsonStr, String imageSize) throws JSONException {
+                    private void getMovieDataFromJson(String movieJsonStr, String imageSize) throws JSONException {
                         // Getting the root "results" array
                         getRealmInstance();
                         JSONObject movieObject = new JSONObject(movieJsonStr);
@@ -240,30 +235,30 @@ public class MainActivityFragment extends Fragment {
 
                         // Base Url for the TMDB images
                         final String ImageBaseUrl = "http://image.tmdb.org/t/p/" + imageSize;
-                        List<String> movieIdList = new ArrayList<>();
-                        movieIdList.add("Test");
 
                         for (int i = 0; i < movieArray.length(); i++) {
                             JSONObject movieTitle = movieArray.getJSONObject(i);
-
-                            mRealm.beginTransaction();
-                            Movie movieDB = new Movie();
-                            movieDB.setMovieId(movieTitle.getString("id"));
-                            movieDB.setPosterImage(ImageBaseUrl + movieTitle.getString("poster_path"));
-                            movieDB.setMovieOriginalTitle(movieTitle.getString("original_title"));
-                            movieDB.setMovieOverview(movieTitle.getString("overview"));
-                            movieDB.setVoteAverage(movieTitle.getString("vote_average"));
-                            movieDB.setMovieReleaseDate(movieTitle.getString("release_date"));
-                            movieDB.setSortOrder(getSortOrderSharedPrefs());
-                            mRealm.copyToRealmOrUpdate(movieDB);
-                            mRealm.commitTransaction();
-                        }
-                        //TODO: Remove the return type dependency
-                        return movieIdList;
+                                mRealm.beginTransaction();
+                                Movie movieDB = new Movie();
+                                movieDB.setMovieId(movieTitle.getString("id"));
+                                movieDB.setPosterImage(ImageBaseUrl + movieTitle.getString("poster_path"));
+                                movieDB.setMovieOriginalTitle(movieTitle.getString("original_title"));
+                                movieDB.setMovieOverview(movieTitle.getString("overview"));
+                                movieDB.setVoteAverage(movieTitle.getString("vote_average"));
+                                movieDB.setMovieReleaseDate(movieTitle.getString("release_date"));
+                                movieDB.setSortOrder(getSortOrderSharedPrefs());
+                                try {
+                                    mRealm.copyToRealm(movieDB);
+                                    mRealm.commitTransaction();
+                                } catch (RealmPrimaryKeyConstraintException e) {
+                                    Utils.Logger("Realm value already exists!");
+                                    mRealm.commitTransaction();
+                                }
+                            }
                     }
 
                     @Override
-                    protected List<String> doInBackground(String... params) {
+                    protected String doInBackground(String... params) {
 
                         if (params.length == 0) {
                             return null;
@@ -333,17 +328,19 @@ public class MainActivityFragment extends Fragment {
                             }
                         }
                         try {
-                            return getMovieDataFromJson(movieDataStr, params[1]);
+                            getMovieDataFromJson(movieDataStr, params[1]);
                         } catch (JSONException e) {
                             Log.e(LOG_TAG, e.getMessage(), e);
                             e.printStackTrace();
                         }
-                        return null;
+                        return movieDataStr;
                     }
                     @Override
-                    protected void onPostExecute(List<String> result) {
+                    protected void onPostExecute(String result) {
+                        if (result != null) {
                             Utils.Logger("Setting Grid View");
                             setGridView();
+                        }
                     }
                 }
         }

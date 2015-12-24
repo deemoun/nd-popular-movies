@@ -1,10 +1,13 @@
 package dyarygin.com.popularmovies;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,29 +39,34 @@ public class DetailActivityFragment extends Fragment {
 
     private static Realm mRealm;
     private Context context;
+    private List<String> movieTrailerList = new ArrayList<>();
 
     public DetailActivityFragment() {
     }
 
-    private static List<String> movieTrailerList = new ArrayList<>();
+    public Realm getRealmInstance(){
+        return mRealm = Realm.getInstance(getActivity().getApplicationContext());
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         context = getActivity().getApplicationContext();
-        Log.v("onCreate", "Executing AsyncTask");
-//        FetchTrailerTask ft = new FetchTrailerTask();
-//        ft.execute();
+    }
+
+    public String getSortOrderSharedPrefs(){
+        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        return sharedPref.getString(getString(R.string.pref_key_sort_order), "popularity.desc");
     }
 
     // Adding FetchTrailerTask
 
-    public class FetchTrailerTask extends AsyncTask<String, Void, List<String>> {
+    public class FetchTrailerTask extends AsyncTask<String, Void, String> {
 
         private final String LOG_TAG = FetchTrailerTask.class.getSimpleName();
 
-        private List<String> getTrailerDataFromJson(String trailerJsonStr) throws JSONException {
+        private void getTrailerDataFromJson(String trailerJsonStr) throws JSONException {
             // Getting the root "results" array
             JSONObject trailerObject = new JSONObject(trailerJsonStr);
 
@@ -71,16 +79,15 @@ public class DetailActivityFragment extends Fragment {
             for (int i = 0; i < trailerArray.length(); i++) {
                 JSONObject trailer = trailerArray.getJSONObject(i);
                 if(trailer.getString("site").contentEquals("YouTube")) {
-                    movieTrailerList.add(YoutubeBaseUrl + trailer.getString("key"));
+                    movieTrailerList.add(i, YoutubeBaseUrl + trailer.getString("key"));
                 }
                 Log.v(LOG_TAG,"Youtube URL IS " + movieTrailerList.get(i));
 
             }
-            return movieTrailerList;
         }
 
         @Override
-        protected List<String> doInBackground(String... params) {
+        protected String doInBackground(String... params) {
 
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
@@ -144,7 +151,7 @@ public class DetailActivityFragment extends Fragment {
                 }
             }
             try {
-                return getTrailerDataFromJson(trailerDataStr);
+                getTrailerDataFromJson(trailerDataStr);
             } catch (JSONException e) {
                 Log.e(LOG_TAG, e.getMessage(), e);
                 e.printStackTrace();
@@ -157,7 +164,7 @@ public class DetailActivityFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(List<String> result) {
+        protected void onPostExecute(String result) {
             if (result != null) {
                 for (int i = 0; i < movieTrailerList.size(); i++) {
                     Log.v(LOG_TAG, "RESULT IS" + movieTrailerList);
@@ -171,7 +178,8 @@ public class DetailActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
 
-        mRealm = Realm.getInstance(getActivity().getApplicationContext());
+
+        getRealmInstance();
 
         // Finding views
         TextView movieOriginalTitleTextView = ButterKnife.findById(view, R.id.movieOriginalTitleTextView);
@@ -180,6 +188,15 @@ public class DetailActivityFragment extends Fragment {
         TextView movieReleaseDateTextView = ButterKnife.findById(view, R.id.movieReleaseDateTextView);
         TextView movieOverviewTextView = ButterKnife.findById(view, R.id.movieOverviewTextView);
         Button favoriteButton = ButterKnife.findById(view, R.id.favoriteButton);
+
+        RecyclerView recList = (RecyclerView) view.findViewById(R.id.trailerCard);
+        recList.setHasFixedSize(true);
+        LinearLayoutManager llm = new LinearLayoutManager(getActivity());
+        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        recList.setLayoutManager(llm);
+
+        TrailersAdapter ta = new TrailersAdapter(createList());
+        recList.setAdapter(ta);
 
         // Setting up the views from intent
 
@@ -207,46 +224,26 @@ public class DetailActivityFragment extends Fragment {
         favoriteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mRealm = Realm.getInstance(getActivity().getApplicationContext());
-                Favorites favModel = new Favorites();
-                RealmResults<Favorites> resultsFav = mRealm.where(Favorites.class)
+                getRealmInstance();
+                Movie favModel = new Movie();
+                RealmResults<Movie> resultsFav = mRealm.where(Movie.class)
                         .equalTo("movieId", movieId)
                         .findAll();
-                String[] resultsArray = new String[resultsFav.size()];
                 mRealm.beginTransaction();
+                favModel.setMovieId(movieId);
+                favModel.setPosterImage(posterImage);
+                favModel.setMovieOriginalTitle(title);
+                favModel.setMovieOverview(overview);
+                favModel.setVoteAverage(voteAverage);
+                favModel.setMovieReleaseDate(releaseDate);
+                favModel.setSortOrder(getSortOrderSharedPrefs());
                 if(resultsFav.get(0).getIsFavorite()){
                     favModel.setIsFavorite(false);
                 } else {
-                    favModel.setMovieId(movieId);
                     favModel.setIsFavorite(true);
                 }
-                mRealm.copyToRealm(favModel);
+                mRealm.copyToRealmOrUpdate(favModel);
                 mRealm.commitTransaction();
-
-//                for(int i = 0; i < resultsFav.size(); i++){
-//                    resultsArray[i] = resultsFav.get(i).getMovieId();
-//                }
-//
-//                if (resultsArray.equals(null)){
-//
-//                }
-//                if(resultsFav.get(0).getMovieId() != null){
-//                    mRealm.beginTransaction();
-//                    if (resultsFav.get(0).getIsFavorite()) {
-//                        Toast.makeText(context, "Removed from Favorites", Toast.LENGTH_SHORT).show();
-//                        favModel.setIsFavorite(false);
-//                    } else {
-//                        Toast.makeText(context, "Added to Favorites", Toast.LENGTH_SHORT).show();
-//                        favModel.setIsFavorite(true);
-//                    }
-//                    mRealm.copyToRealmOrUpdate(favModel);
-//                    mRealm.commitTransaction();
-//                } else {
-//                    mRealm.beginTransaction();
-//                    favModel.setMovieId(movieId);
-//                    favModel.setIsFavorite(true);
-//                    mRealm.commitTransaction();
-//                }
               }
         });
 
@@ -259,6 +256,25 @@ public class DetailActivityFragment extends Fragment {
                     .into(posterImageView);
         return view;
 
+    }
+
+    private List<TrailersInfo> createList() {
+
+        List<TrailersInfo> result = new ArrayList<TrailersInfo>();
+        FetchTrailerTask ft = new FetchTrailerTask();
+        ft.execute();
+        Utils.Logger("Executing Trailer AsyncTask");
+        for (int i=1; i <= movieTrailerList.size(); i++) {
+            System.out.println(movieTrailerList.get(i));
+            TrailersInfo ti = new TrailersInfo();
+            ti.title = movieTrailerList.get(i) + i;
+            ti.description = TrailersInfo.DESCRIPTION_PREFIX + i;
+
+            result.add(ti);
+
+        }
+
+        return result;
     }
 
     @Override
@@ -274,7 +290,7 @@ public class DetailActivityFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        movieTrailerList.clear();
+        //movieTrailerList.clear();
         mRealm.close();
     }
 
@@ -282,13 +298,13 @@ public class DetailActivityFragment extends Fragment {
     public  void onStop(){
         super.onStop();
         mRealm.close();
-        movieTrailerList.clear();
+        //movieTrailerList.clear();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         mRealm.close();
-        movieTrailerList.clear();
+        //movieTrailerList.clear();
     }
 }

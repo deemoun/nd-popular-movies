@@ -13,6 +13,16 @@ public class Movie extends RealmObject {
     private String movieOverview;
     private String sortOrder;
 
+    public boolean getIsFavorite() {
+        return isFavorite;
+    }
+
+    public void setIsFavorite(boolean isFavorite) {
+        this.isFavorite = isFavorite;
+    }
+
+    private boolean isFavorite;
+
     public String getSortOrder() {
         return sortOrder;
     }

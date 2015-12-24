@@ -83,13 +83,19 @@
         android:layout_toEndOf="@+id/posterImageView"
         android:textAppearance="?android:attr/textAppearanceSmall"
         />
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/trailerCard"
+        android:layout_below="@id/posterImageView"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        />
     <TextView
         android:id="@+id/movieOverviewLabel"
         style="@style/detailViewStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/overview"
-        android:layout_below="@+id/posterImageView"
+        android:layout_below="@+id/trailerCard"
         android:textStyle="bold"
         android:textAppearance="?android:attr/textAppearanceMedium" />
     <TextView
