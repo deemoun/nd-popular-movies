@@ -91,6 +91,12 @@
         android:layout_width="match_parent"
         android:layout_height="70dp"
         />
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/reviewCard"
+        android:layout_below="@id/trailerCard"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        />
     <TextView
         android:id="@+id/movieOverviewLabel"
         style="@style/detailViewStyle"

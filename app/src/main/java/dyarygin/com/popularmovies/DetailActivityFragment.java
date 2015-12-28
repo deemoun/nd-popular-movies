@@ -40,6 +40,7 @@ public class DetailActivityFragment extends Fragment {
     private static Realm mRealm;
     private Context context;
     private List<String> movieTrailerList = new ArrayList<>();
+    private List<String> movieReviewList = new ArrayList<>();
 
     public DetailActivityFragment() {
     }
@@ -176,6 +177,113 @@ public class DetailActivityFragment extends Fragment {
         }
     }
 
+    // Adding FetchReviewsTask
+
+    public class FetchReviewTask extends AsyncTask<String, Void, String> {
+
+        private final String LOG_TAG = FetchTrailerTask.class.getSimpleName();
+
+        private void getReviewDataFromJson(String reviewJsonStr) throws JSONException {
+            // Getting the root "results" array
+            JSONObject reviewObject = new JSONObject(reviewJsonStr);
+
+            JSONArray reviewArray = reviewObject.getJSONArray("results");
+
+
+            for (int i = 0; i < reviewArray.length(); i++) {
+                JSONObject review = reviewArray.getJSONObject(i);
+                    movieReviewList.add(i, review.getString("content"));
+            }
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            HttpURLConnection urlConnection = null;
+            BufferedReader reader = null;
+
+            // Will contain the raw JSON response as a string.
+            String reviewDataStr = null;
+
+            try {
+                // Construct the URL
+                final DetailActivity detailActivity = (DetailActivity) getActivity();
+                final String BASE_URL = "http://api.themoviedb.org/3/movie/" + detailActivity.getMovieId() + "/reviews";
+
+                Uri buildUri = Uri.parse(BASE_URL).buildUpon()
+                        .appendQueryParameter("api_key", Config.DBAPIKEY)
+                        .build();
+
+                URL url = new URL(buildUri.toString());
+                Log.e(LOG_TAG, "Review url is " + url);
+
+
+                // Create the request to TMDB
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("GET");
+                urlConnection.connect();
+
+                // Read the input stream into a String
+                InputStream inputStream = urlConnection.getInputStream();
+                StringBuffer buffer = new StringBuffer();
+                if (inputStream == null) {
+                    // Nothing to do.
+                    return null;
+                }
+                reader = new BufferedReader(new InputStreamReader(inputStream));
+
+                String line;
+                while ((line = reader.readLine()) != null) {
+
+                    buffer.append(line + "\n");
+                }
+
+                if (buffer.length() == 0) {
+                    // Stream was empty.  No point in parsing.
+                    return null;
+                }
+                reviewDataStr = buffer.toString();
+                Log.e(LOG_TAG, "REVIEW STREAM IS " + reviewDataStr);
+
+            } catch (IOException e) {
+                Log.e(LOG_TAG, "Error ", e);
+                return null;
+            } finally {
+                if (urlConnection != null) {
+                    urlConnection.disconnect();
+                }
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (final IOException e) {
+                        Log.e(LOG_TAG, "Error closing stream", e);
+                    }
+                }
+            }
+            try {
+                getReviewDataFromJson(reviewDataStr);
+            } catch (JSONException e) {
+                Log.e(LOG_TAG, e.getMessage(), e);
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            RecyclerView recListReviews = (RecyclerView) getView().findViewById(R.id.reviewCard);
+            recListReviews.setHasFixedSize(true);
+            LinearLayoutManager llm = new LinearLayoutManager(getActivity());
+            llm.setOrientation(LinearLayoutManager.VERTICAL);
+            recListReviews.setLayoutManager(llm);
+            ReviewAdapter ra = new ReviewAdapter(createReviewList());
+            recListReviews.setAdapter(ra);
+        }
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -193,8 +301,13 @@ public class DetailActivityFragment extends Fragment {
         final Button favoriteButton = ButterKnife.findById(view, R.id.favoriteButton);
 
         // Executing FetchTrailer task
-        FetchTrailerTask ft = new FetchTrailerTask();
-        ft.execute();
+        FetchTrailerTask ftT = new FetchTrailerTask();
+        ftT.execute();
+
+        // Executing FetchReview task
+        FetchReviewTask ftR = new FetchReviewTask();
+        ftR.execute();
+
 
 
         // Setting up the views from intent
@@ -277,6 +390,19 @@ public class DetailActivityFragment extends Fragment {
             result.add(ti);
         }
 
+        return result;
+    }
+
+    private List<ReviewInfo> createReviewList() {
+
+        List<ReviewInfo> result = new ArrayList<>();
+        Utils.Logger("Executing Review AsyncTask");
+        for (int i=0; i < movieReviewList.size(); i++) {
+            ReviewInfo ri = new ReviewInfo();
+            ri.reviewContent = movieReviewList.get(i);
+            Utils.Logger("CURRENT ELEMENT IN REVIEW ARRAY: " + movieReviewList.get(i));
+            result.add(ri);
+        }
         return result;
     }
 
