@@ -11,6 +11,8 @@
     <string name="release_date">Release date:</string>
     <string name="overview">Synopsis</string>
     <string name="no_movie_overview">No movie overview</string>
+    <string name="mark_as_fav_movie">Mark as Favorite</string>
+    <string name="remove_from_favorite">Remove from Favorite</string>
     <string name="title">Title</string>
     <!--Preference keys -->
     <string name="pref_key_sort_order" translatable="false">sortOrder</string>

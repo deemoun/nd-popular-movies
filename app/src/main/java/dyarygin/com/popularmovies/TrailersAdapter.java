@@ -1,5 +1,8 @@
 package dyarygin.com.popularmovies;
 
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,9 +14,11 @@ import java.util.List;
 public class TrailersAdapter extends RecyclerView.Adapter<TrailersAdapter.TrailersViewHolder> {
 
     private List<TrailersInfo> trailersList;
+    private Context mContext;
 
-    public TrailersAdapter(List<TrailersInfo> trailersList){
+    public TrailersAdapter(List<TrailersInfo> trailersList, Context context){
         this.trailersList = trailersList;
+        this.mContext = context;
     }
 
     @Override
@@ -23,9 +28,10 @@ public class TrailersAdapter extends RecyclerView.Adapter<TrailersAdapter.Traile
 
     @Override
     public void onBindViewHolder(TrailersViewHolder trailersViewHolder, int i ){
-        TrailersInfo ti = trailersList.get(i);
-        trailersViewHolder.vTitle.setText(ti.title);
-        trailersViewHolder.vDescription.setText(ti.description);
+        final TrailersInfo ti = trailersList.get(i);
+        trailersViewHolder.context = mContext;
+        trailersViewHolder.currentValue = ti;
+        trailersViewHolder.vCardName.setText(ti.cardname);
     }
 
     @Override
@@ -35,13 +41,19 @@ public class TrailersAdapter extends RecyclerView.Adapter<TrailersAdapter.Traile
     }
 
     public static class TrailersViewHolder extends RecyclerView.ViewHolder{
-        protected TextView vTitle;
-        protected TextView vDescription;
+        protected TextView vCardName;
+        public TrailersInfo currentValue;
+        protected Context context;
 
         public TrailersViewHolder(View v) {
             super(v);
-            vTitle = (TextView) v.findViewById(R.id.trailerTitle);
-            vDescription = (TextView) v.findViewById(R.id.trailerDescription);
+            vCardName = (TextView) v.findViewById(R.id.trailerCardName);
+            vCardName.setOnClickListener(new View.OnClickListener()       {
+                @Override
+            public void onClick(View v) {
+                    Utils.Logger("Youtube link is: " + currentValue.title);
+                    context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(currentValue.title)));
+                }});
         }
     }
 }

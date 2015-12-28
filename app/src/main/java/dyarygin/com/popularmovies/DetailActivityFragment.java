@@ -165,11 +165,14 @@ public class DetailActivityFragment extends Fragment {
 
         @Override
         protected void onPostExecute(String result) {
-            if (result != null) {
-                for (int i = 0; i < movieTrailerList.size(); i++) {
                     Log.v(LOG_TAG, "RESULT IS" + movieTrailerList);
-                }
-            }
+                    RecyclerView recList = (RecyclerView) getView().findViewById(R.id.trailerCard);
+                    recList.setHasFixedSize(true);
+                    LinearLayoutManager llm = new LinearLayoutManager(getActivity());
+                    llm.setOrientation(LinearLayoutManager.VERTICAL);
+                    recList.setLayoutManager(llm);
+                    TrailersAdapter ta = new TrailersAdapter(createYoutubeList(),getContext());
+                    recList.setAdapter(ta);
         }
     }
 
@@ -187,16 +190,12 @@ public class DetailActivityFragment extends Fragment {
         TextView voteAverageTextView = ButterKnife.findById(view, R.id.voteAverageTextView);
         TextView movieReleaseDateTextView = ButterKnife.findById(view, R.id.movieReleaseDateTextView);
         TextView movieOverviewTextView = ButterKnife.findById(view, R.id.movieOverviewTextView);
-        Button favoriteButton = ButterKnife.findById(view, R.id.favoriteButton);
+        final Button favoriteButton = ButterKnife.findById(view, R.id.favoriteButton);
 
-        RecyclerView recList = (RecyclerView) view.findViewById(R.id.trailerCard);
-        recList.setHasFixedSize(true);
-        LinearLayoutManager llm = new LinearLayoutManager(getActivity());
-        llm.setOrientation(LinearLayoutManager.VERTICAL);
-        recList.setLayoutManager(llm);
+        // Executing FetchTrailer task
+        FetchTrailerTask ft = new FetchTrailerTask();
+        ft.execute();
 
-        TrailersAdapter ta = new TrailersAdapter(createList());
-        recList.setAdapter(ta);
 
         // Setting up the views from intent
 
@@ -211,6 +210,13 @@ public class DetailActivityFragment extends Fragment {
         final String releaseDate = results.get(0).getMovieReleaseDate();
         final String overview = results.get(0).getMovieOverview();
         final String title = results.get(0).getMovieOriginalTitle();
+        final boolean isFavorite = results.get(0).getIsFavorite();
+
+        if(isFavorite){
+            favoriteButton.setText(getString(R.string.remove_from_favorite));
+        } else {
+            favoriteButton.setText(getString(R.string.mark_as_fav_movie));
+        }
 
         movieOriginalTitleTextView.setText(title);
         voteAverageTextView.setText(voteAverage);
@@ -239,8 +245,10 @@ public class DetailActivityFragment extends Fragment {
                 favModel.setSortOrder(getSortOrderSharedPrefs());
                 if(resultsFav.get(0).getIsFavorite()){
                     favModel.setIsFavorite(false);
+                    favoriteButton.setText(getString(R.string.mark_as_fav_movie));
                 } else {
                     favModel.setIsFavorite(true);
+                    favoriteButton.setText(getString(R.string.remove_from_favorite));
                 }
                 mRealm.copyToRealmOrUpdate(favModel);
                 mRealm.commitTransaction();
@@ -258,20 +266,15 @@ public class DetailActivityFragment extends Fragment {
 
     }
 
-    private List<TrailersInfo> createList() {
+    private List<TrailersInfo> createYoutubeList() {
 
-        List<TrailersInfo> result = new ArrayList<TrailersInfo>();
-        FetchTrailerTask ft = new FetchTrailerTask();
-        ft.execute();
+        List<TrailersInfo> result = new ArrayList<>();
         Utils.Logger("Executing Trailer AsyncTask");
-        for (int i=1; i <= movieTrailerList.size(); i++) {
-            System.out.println(movieTrailerList.get(i));
+        for (int i=0; i < movieTrailerList.size(); i++) {
             TrailersInfo ti = new TrailersInfo();
-            ti.title = movieTrailerList.get(i) + i;
-            ti.description = TrailersInfo.DESCRIPTION_PREFIX + i;
-
+            ti.title = movieTrailerList.get(i);
+            ti.cardname = TrailersInfo.Trailer_PREFIX + (i+1);
             result.add(ti);
-
         }
 
         return result;
@@ -291,20 +294,34 @@ public class DetailActivityFragment extends Fragment {
     public void onPause() {
         super.onPause();
         //movieTrailerList.clear();
-        mRealm.close();
+        if (mRealm.isClosed()){
+            // Already closed
+        }
+        else {
+            mRealm.close();
+        }
     }
 
     @Override
     public  void onStop(){
         super.onStop();
-        mRealm.close();
+        if (mRealm.isClosed()){
+            // Already closed
+        }
+        else {
+            mRealm.close();
+        }
         //movieTrailerList.clear();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mRealm.close();
-        //movieTrailerList.clear();
+        if (mRealm.isClosed()){
+            // Already closed
+        }
+        else {
+            mRealm.close();
+        }
     }
 }

@@ -6,5 +6,5 @@
     <color name="LawnGreen">#7CFC00</color>
     <color name="colorAccent">#FF4081</color>
     <color name="backgroundColor">#000000</color>
-    <color name="textColor">#ffffff</color>
+    <color name="textColorWhite">#ffffff</color>
 </resources>

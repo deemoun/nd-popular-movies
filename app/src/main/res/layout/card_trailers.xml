@@ -3,34 +3,25 @@
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/card_trailers"
-    android:layout_width="match_parent"
+    android:src="@drawable/ic_play_circle_filled_black_24dp"
+    android:layout_width="wrap_content"
     android:layout_height="match_parent"
-    card_view:cardCornerRadius="4dp"
+    android:layout_centerHorizontal="true"
+    card_view:cardCornerRadius="0dp"
     android:layout_margin="5dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
         <TextView
-            android:id="@+id/trailerTitle"
-            android:layout_width="match_parent"
+            android:id="@+id/trailerCardName"
+            android:layout_width="80dp"
             android:layout_height="wrap_content"
-            android:background="@android:color/holo_blue_bright"
-            android:text="contact det"
-            android:gravity="center_vertical"
-            android:textColor="@android:color/white"
-            android:textSize="14dp"/>
-
-        <TextView
-            android:id="@+id/trailerDescription"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Name Test test test"
-            android:gravity="center_vertical"
-            android:textSize="12sp"
-            android:layout_marginTop="10dp"
-            android:layout_marginLeft="5dp"/>
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_centerHorizontal="true"
+            android:text="Name of the card"
+            android:background="@color/textColorWhite"
+            android:textStyle="bold"/>
 
     </RelativeLayout>
 </android.support.v7.widget.CardView>
