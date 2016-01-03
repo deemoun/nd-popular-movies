@@ -5,24 +5,30 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.facebook.stetho.Stetho;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MainActivityFragment.Callback {
+
+    private boolean mTwoPane;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        if (findViewById(R.id.fragment_container) != null) {
-//            if (savedInstanceState != null) {
-//                return;
-//            }
-//            FragmentManager fragmentManager = getFragmentManager();
-//
-//            fragmentManager.beginTransaction()
-//                    .add(R.id.fragment_container, new DetailActivityFragment())
-//                    .commit();
-//        }
-
+        if (findViewById(R.id.fragmentDetailContainer) != null) {
+            mTwoPane = true;
+            if (savedInstanceState == null){
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragmentDetailContainer, new TabletDetailActivityFragment(), "TAG")
+                        .commit();
+            } else {
+                mTwoPane = false;
+            }
+        }
         Stetho.initializeWithDefaults(this);
+    }
+
+    @Override
+    public void onItemSelected(String movieId) {
+
     }
 }

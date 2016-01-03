@@ -12,10 +12,20 @@ public class DetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_detail);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        if(savedInstanceState == null) {
+            setContentView(R.layout.activity_detail);
+            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+            setSupportActionBar(toolbar);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+            DetailActivityFragment fragment = new DetailActivityFragment();
+//            fragment.setArguments(arguments);
+
+//            getSupportFragmentManager().beginTransaction()
+//                    .add(R.id.fragmentDetailContainer, fragment)
+//                    .commit();
+        }
 
     }
 

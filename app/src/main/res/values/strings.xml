@@ -17,4 +17,5 @@
     <string name="title">Title</string>
     <!--Preference keys -->
     <string name="pref_key_sort_order" translatable="false">sortOrder</string>
+    <string name="title_activity_tablet_detail">TabletDetailActivity</string>
 </resources>

@@ -117,6 +117,7 @@ public class MainActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
         View v =  inflater.inflate(R.layout.fragment_main, container, false);
         final MainActivity mainActivity = (MainActivity) getActivity();
+
         setRetainInstance(true);
         Toolbar toolbar = (Toolbar) v.findViewById(R.id.toolbar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
@@ -184,6 +185,8 @@ public class MainActivityFragment extends Fragment {
                         // Handling of the click
                         Intent intent = new Intent(getActivity(), DetailActivity.class);
                         intent.putExtra(Config.EXTRA_MOVIEID, movieId[position]);
+                        // Setting callback for movieId
+                        ((Callback) getActivity()).onItemSelected(movieId[position]);
                         startActivity(intent);
                     }
                 });
@@ -191,6 +194,10 @@ public class MainActivityFragment extends Fragment {
         } else {
             Toast.makeText(getActivity().getApplicationContext(), "No favorite movies yet!", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public interface Callback {
+        void onItemSelected(String movieId);
     }
 
     public void setGridView() {

@@ -37,7 +37,9 @@ import io.realm.RealmResults;
 
 public class DetailActivityFragment extends Fragment {
 
+    static final String DETAIL_MOVIE = "DETAIL_MOVIE";
     private static Realm mRealm;
+    private String mMovie;
     private Context context;
     private List<String> movieTrailerList = new ArrayList<>();
     private List<String> movieReviewList = new ArrayList<>();
@@ -289,7 +291,12 @@ public class DetailActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
 
+        // Getting arguments from Bundle
 
+        Bundle arguments = getArguments();
+        if (arguments != null) {
+            mMovie = arguments.getParcelable(DetailActivityFragment.DETAIL_MOVIE);
+        }
         getRealmInstance();
 
         // Finding views
@@ -307,8 +314,6 @@ public class DetailActivityFragment extends Fragment {
         // Executing FetchReview task
         FetchReviewTask ftR = new FetchReviewTask();
         ftR.execute();
-
-
 
         // Setting up the views from intent
 
