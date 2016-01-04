@@ -25,6 +25,4 @@ public class NoFavoriteMovieFragment extends Fragment {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_no_favorite_movie, container, false);
     }
-
-
 }

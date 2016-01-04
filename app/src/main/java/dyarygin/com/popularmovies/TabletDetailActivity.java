@@ -10,7 +10,6 @@ public class TabletDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tablet_detail);
 
-
     }
 
 }

@@ -14,9 +14,6 @@ public class DetailActivity extends AppCompatActivity {
 
         if(savedInstanceState == null) {
             setContentView(R.layout.activity_detail);
-//            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//            setSupportActionBar(toolbar);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
             DetailActivityFragment fragment = new DetailActivityFragment();
 //            fragment.setArguments(arguments);

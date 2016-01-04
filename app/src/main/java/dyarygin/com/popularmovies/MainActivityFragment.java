@@ -1,5 +1,6 @@
 package dyarygin.com.popularmovies;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
@@ -41,8 +42,13 @@ public class MainActivityFragment extends Fragment {
     private static Realm mRealm;
     private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
     private static View view;
+    movieSelectorListener mCallback;
 
     public MainActivityFragment() {
+    }
+
+    public interface movieSelectorListener {
+        void onMovieSelected(String position);
     }
 
     public View getCurrentView(){
@@ -83,6 +89,17 @@ public class MainActivityFragment extends Fragment {
     // Image size format used for the displaying images
     public final static String IMAGE_FORMAT = "w185";
 
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mCallback = (movieSelectorListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement onMovieSelected");
+        }
+    }
+
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
@@ -121,7 +138,7 @@ public class MainActivityFragment extends Fragment {
         // Getting current sort value from SharedPreference
 
         String sortOrderValue = getSortOrderSharedPrefs();
-            updateMovies(sortOrderValue, IMAGE_FORMAT);
+        updateMovies(sortOrderValue, IMAGE_FORMAT);
         return v;
     }
 
@@ -181,8 +198,6 @@ public class MainActivityFragment extends Fragment {
                         // Handling of the click
                         Intent intent = new Intent(getActivity(), DetailActivity.class);
                         intent.putExtra(Config.EXTRA_MOVIEID, movieId[position]);
-                        // Setting callback for movieId
-                        ((Callback) getActivity()).onItemSelected(movieId[position]);
                         startActivity(intent);
                     }
                 });
@@ -196,12 +211,9 @@ public class MainActivityFragment extends Fragment {
         }
     }
 
-    public interface Callback {
-        void onItemSelected(String movieId);
-    }
-
     public void setGridView() {
         getRealmInstance();
+        final MainActivity mainActivity = (MainActivity) getActivity();
         RealmResults<Movie> results = mRealm.where(Movie.class)
                 .equalTo("sortOrder", getSortOrderSharedPrefs())
                 .findAll();
@@ -222,10 +234,15 @@ public class MainActivityFragment extends Fragment {
             gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Intent intent = new Intent(getActivity(), DetailActivity.class);
-                    intent.putExtra(Config.EXTRA_MOVIEID, movieId[position]);
-                    startActivity(intent);
-
+                    if(mainActivity.ismTwoPane()) {
+                        Utils.Logger("Tablet UI detected. Not launching activity.");
+                        mCallback.onMovieSelected(movieId[position]);
+                    } else {
+                        Utils.Logger("Phone UI detected. Launching activity.");
+                        Intent intent = new Intent(getActivity(), DetailActivity.class);
+                        intent.putExtra(Config.EXTRA_MOVIEID, movieId[position]);
+                        startActivity(intent);
+                    }
                 }
             });
         }

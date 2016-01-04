@@ -2,12 +2,19 @@ package dyarygin.com.popularmovies;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.Toast;
 
 import com.facebook.stetho.Stetho;
 
-public class MainActivity extends AppCompatActivity implements MainActivityFragment.Callback {
+public class MainActivity extends AppCompatActivity implements MainActivityFragment.movieSelectorListener {
 
-    private boolean mTwoPane;
+    public boolean ismTwoPane() {
+        if (findViewById(R.id.fragmentDetailContainer) != null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -15,20 +22,17 @@ public class MainActivity extends AppCompatActivity implements MainActivityFragm
         setContentView(R.layout.activity_main);
 
         if (findViewById(R.id.fragmentDetailContainer) != null) {
-            mTwoPane = true;
-            if (savedInstanceState == null){
+            if (ismTwoPane()){
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragmentDetailContainer, new TabletDetailActivityFragment(), "TAG")
                         .commit();
-            } else {
-                mTwoPane = false;
             }
         }
         Stetho.initializeWithDefaults(this);
     }
 
-    @Override
-    public void onItemSelected(String movieId) {
-
+    public void onMovieSelected(String movieId){
+        Toast.makeText(getApplicationContext(), movieId, Toast.LENGTH_SHORT).show();
     }
+
 }
