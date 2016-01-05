@@ -14,19 +14,10 @@ public class DetailActivity extends AppCompatActivity {
 
         if(savedInstanceState == null) {
             setContentView(R.layout.activity_detail);
-
-            DetailActivityFragment fragment = new DetailActivityFragment();
-//            fragment.setArguments(arguments);
-
-//            getSupportFragmentManager().beginTransaction()
-//                    .add(R.id.fragmentDetailContainer, fragment)
-//                    .commit();
         }
-
     }
 
     public String getMovieId(){
         return getIntent().getStringExtra(Config.EXTRA_MOVIEID);
     }
-
 }

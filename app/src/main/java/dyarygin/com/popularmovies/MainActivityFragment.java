@@ -234,15 +234,8 @@ public class MainActivityFragment extends Fragment {
             gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    if(mainActivity.ismTwoPane()) {
-                        Utils.Logger("Tablet UI detected. Not launching activity.");
+                        Utils.Logger("Making callback to activity");
                         mCallback.onMovieSelected(movieId[position]);
-                    } else {
-                        Utils.Logger("Phone UI detected. Launching activity.");
-                        Intent intent = new Intent(getActivity(), DetailActivity.class);
-                        intent.putExtra(Config.EXTRA_MOVIEID, movieId[position]);
-                        startActivity(intent);
-                    }
                 }
             });
         }

@@ -48,6 +48,8 @@ public class TabletDetailActivityFragment extends Fragment {
     }
 
     public String getMovieId() {
+        // return "140607" for dummy movie
+
        return "140607";
     }
 

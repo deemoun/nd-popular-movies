@@ -39,7 +39,6 @@ public class DetailActivityFragment extends Fragment {
 
     static final String DETAIL_MOVIE = "DETAIL_MOVIE";
     private static Realm mRealm;
-    private String mMovie;
     private Context context;
     private List<String> movieTrailerList = new ArrayList<>();
     private List<String> movieReviewList = new ArrayList<>();
@@ -294,9 +293,7 @@ public class DetailActivityFragment extends Fragment {
         // Getting arguments from Bundle
 
         Bundle arguments = getArguments();
-        if (arguments != null) {
-            mMovie = arguments.getParcelable(DetailActivityFragment.DETAIL_MOVIE);
-        }
+
         getRealmInstance();
 
         // Finding views
