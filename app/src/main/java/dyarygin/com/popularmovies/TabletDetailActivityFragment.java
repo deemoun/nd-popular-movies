@@ -48,9 +48,12 @@ public class TabletDetailActivityFragment extends Fragment {
     }
 
     public String getMovieId() {
-        // return "140607" for dummy movie
-
-       return "140607";
+        Bundle bundle = this.getArguments();
+        if(getArguments() != null){
+        return bundle.getString(Config.EXTRA_MOVIEID, "140607");
+        } else {
+            return "140607";
+        }
     }
 
     public Realm getRealmInstance(){

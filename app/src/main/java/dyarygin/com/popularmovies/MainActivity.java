@@ -37,6 +37,14 @@ public class MainActivity extends AppCompatActivity implements MainActivityFragm
             Toast.makeText(getApplicationContext(), movieId, Toast.LENGTH_SHORT).show();
             Bundle mBundle = new Bundle();
             mBundle.putString(Config.EXTRA_MOVIEID, movieId);
+
+            TabletDetailActivityFragment fragment = new TabletDetailActivityFragment();
+            fragment.setArguments(mBundle);
+
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragmentMovieHolder, fragment, "TAG")
+                    .commit();
+
         } else {
             Intent intent = new Intent(this, DetailActivity.class);
             intent.putExtra(Config.EXTRA_MOVIEID, movieId);
