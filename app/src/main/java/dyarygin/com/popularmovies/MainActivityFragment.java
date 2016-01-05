@@ -3,7 +3,6 @@ package dyarygin.com.popularmovies;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -196,9 +195,7 @@ public class MainActivityFragment extends Fragment {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         // Handling of the click
-                        Intent intent = new Intent(getActivity(), DetailActivity.class);
-                        intent.putExtra(Config.EXTRA_MOVIEID, movieId[position]);
-                        startActivity(intent);
+                        mCallback.onMovieSelected(movieId[position]);
                     }
                 });
             }
@@ -213,7 +210,6 @@ public class MainActivityFragment extends Fragment {
 
     public void setGridView() {
         getRealmInstance();
-        final MainActivity mainActivity = (MainActivity) getActivity();
         RealmResults<Movie> results = mRealm.where(Movie.class)
                 .equalTo("sortOrder", getSortOrderSharedPrefs())
                 .findAll();

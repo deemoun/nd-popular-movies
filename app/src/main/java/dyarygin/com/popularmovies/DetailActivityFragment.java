@@ -37,13 +37,27 @@ import io.realm.RealmResults;
 
 public class DetailActivityFragment extends Fragment {
 
-    static final String DETAIL_MOVIE = "DETAIL_MOVIE";
     private static Realm mRealm;
     private Context context;
     private List<String> movieTrailerList = new ArrayList<>();
     private List<String> movieReviewList = new ArrayList<>();
 
     public DetailActivityFragment() {
+    }
+
+    private String getMovieId() {
+
+        Bundle bundle = this.getArguments();
+
+        if(getActivity().getIntent().getStringExtra(Config.EXTRA_MOVIEID) != null){
+            return getActivity().getIntent().getStringExtra(Config.EXTRA_MOVIEID);
+        } else {
+            if (getArguments() != null) {
+                return bundle.getString(Config.EXTRA_MOVIEID, "140607");
+            } else {
+                return "140607";
+            }
+        }
     }
 
     public Realm getRealmInstance(){
@@ -83,7 +97,7 @@ public class DetailActivityFragment extends Fragment {
                 if(trailer.getString("site").contentEquals("YouTube")) {
                     movieTrailerList.add(i, YoutubeBaseUrl + trailer.getString("key"));
                 }
-                Log.v(LOG_TAG,"Youtube URL IS " + movieTrailerList.get(i));
+                Log.v(LOG_TAG, "Youtube URL IS " + movieTrailerList.get(i));
 
             }
         }
@@ -99,8 +113,7 @@ public class DetailActivityFragment extends Fragment {
 
             try {
                 // Construct the URL
-                final DetailActivity detailActivity = (DetailActivity) getActivity();
-                final String BASE_URL = "http://api.themoviedb.org/3/movie/" + detailActivity.getMovieId() + "/videos";
+                final String BASE_URL = "http://api.themoviedb.org/3/movie/" + getMovieId() + "/videos";
 
                 Uri buildUri = Uri.parse(BASE_URL).buildUpon()
                         .appendQueryParameter("api_key", Config.DBAPIKEY)
@@ -167,14 +180,14 @@ public class DetailActivityFragment extends Fragment {
 
         @Override
         protected void onPostExecute(String result) {
-                    Log.v(LOG_TAG, "RESULT IS" + movieTrailerList);
-                    RecyclerView recList = (RecyclerView) getView().findViewById(R.id.trailerCard);
-                    recList.setHasFixedSize(true);
-                    LinearLayoutManager llm = new LinearLayoutManager(getActivity());
-                    llm.setOrientation(LinearLayoutManager.VERTICAL);
-                    recList.setLayoutManager(llm);
-                    TrailersAdapter ta = new TrailersAdapter(createYoutubeList(),getContext());
-                    recList.setAdapter(ta);
+            Log.v(LOG_TAG, "RESULT IS" + movieTrailerList);
+            RecyclerView recList = (RecyclerView) getView().findViewById(R.id.trailerCard);
+            recList.setHasFixedSize(true);
+            LinearLayoutManager llm = new LinearLayoutManager(getActivity());
+            llm.setOrientation(LinearLayoutManager.VERTICAL);
+            recList.setLayoutManager(llm);
+            TrailersAdapter ta = new TrailersAdapter(createYoutubeList(),getContext());
+            recList.setAdapter(ta);
         }
     }
 
@@ -193,7 +206,7 @@ public class DetailActivityFragment extends Fragment {
 
             for (int i = 0; i < reviewArray.length(); i++) {
                 JSONObject review = reviewArray.getJSONObject(i);
-                    movieReviewList.add(i, review.getString("content"));
+                movieReviewList.add(i, review.getString("content"));
             }
         }
 
@@ -208,8 +221,7 @@ public class DetailActivityFragment extends Fragment {
 
             try {
                 // Construct the URL
-                final DetailActivity detailActivity = (DetailActivity) getActivity();
-                final String BASE_URL = "http://api.themoviedb.org/3/movie/" + detailActivity.getMovieId() + "/reviews";
+                final String BASE_URL = "http://api.themoviedb.org/3/movie/" + getMovieId() + "/reviews";
 
                 Uri buildUri = Uri.parse(BASE_URL).buildUpon()
                         .appendQueryParameter("api_key", Config.DBAPIKEY)
@@ -290,10 +302,6 @@ public class DetailActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
 
-        // Getting arguments from Bundle
-
-        Bundle arguments = getArguments();
-
         getRealmInstance();
 
         // Finding views
@@ -314,8 +322,7 @@ public class DetailActivityFragment extends Fragment {
 
         // Setting up the views from intent
 
-        final DetailActivity detailActivity = (DetailActivity) getActivity();
-        final String movieId = detailActivity.getMovieId();
+        final String movieId = getMovieId();
 
 //         Getting data from Realm
         final RealmResults<Movie> results = mRealm.where(Movie.class).equalTo("movieId", movieId).findAll();
@@ -367,16 +374,16 @@ public class DetailActivityFragment extends Fragment {
                 }
                 mRealm.copyToRealmOrUpdate(favModel);
                 mRealm.commitTransaction();
-              }
+            }
         });
 
-            Picasso.with(context)
-                    .load(posterImage)
-                    .placeholder(R.drawable.movie_placeholder)
-                    .error(R.drawable.no_movie_image)
-                    .noFade().resize(555, 834)
-                    .centerCrop()
-                    .into(posterImageView);
+        Picasso.with(context)
+                .load(posterImage)
+                .placeholder(R.drawable.movie_placeholder)
+                .error(R.drawable.no_movie_image)
+                .noFade().resize(555, 834)
+                .centerCrop()
+                .into(posterImageView);
         return view;
 
     }

@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityFragm
         if (findViewById(R.id.fragmentMovieHolder) != null) {
             if (ismTwoPane()) {
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragmentMovieHolder, new TabletDetailActivityFragment(), "TAG")
+                        .replace(R.id.fragmentMovieHolder, new DetailActivityFragment(), "TAG")
                         .commit();
             }
         }
@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityFragm
             Bundle mBundle = new Bundle();
             mBundle.putString(Config.EXTRA_MOVIEID, movieId);
 
-            TabletDetailActivityFragment fragment = new TabletDetailActivityFragment();
+            DetailActivityFragment fragment = new DetailActivityFragment();
             fragment.setArguments(mBundle);
 
             getSupportFragmentManager().beginTransaction()

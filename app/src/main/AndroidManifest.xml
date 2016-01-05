@@ -28,10 +28,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="dyarygin.com.popularmovies.MainActivity" />
         </activity>
-        <activity
-            android:name=".TabletDetailActivity"
-            android:label="@string/title_activity_tablet_detail"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>
