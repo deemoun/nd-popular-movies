@@ -25,6 +25,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
     public void onBindViewHolder(ReviewViewHolder reviewViewHolder, int i ){
         final ReviewInfo ti = reviewList.get(i);
         reviewViewHolder.vCardName.setText(ti.reviewContent);
+        reviewViewHolder.vCardAuthor.setText(ti.reviewAuthor);
     }
 
     @Override
@@ -35,10 +36,12 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
 
     public static class ReviewViewHolder extends RecyclerView.ViewHolder{
         protected TextView vCardName;
+        protected TextView vCardAuthor;
 
         public ReviewViewHolder(View v) {
             super(v);
             vCardName = (TextView) v.findViewById(R.id.reviewCardName);
+            vCardAuthor = (TextView) v.findViewById(R.id.reviewAuthorName);
         }
     }
 }

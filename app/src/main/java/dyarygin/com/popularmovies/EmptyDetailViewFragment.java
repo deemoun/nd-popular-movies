@@ -1,28 +1,26 @@
 package dyarygin.com.popularmovies;
 
-import android.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+public class EmptyDetailViewFragment extends Fragment {
 
-public class NoFavoriteMovieFragment extends Fragment {
-
-    public NoFavoriteMovieFragment() {
+    public EmptyDetailViewFragment() {
         // Required empty public constructor
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_no_favorite_movie, container, false);
+        return inflater.inflate(R.layout.fragment_empty_detail_view, container, false);
     }
 }

@@ -40,7 +40,8 @@ public class DetailActivityFragment extends Fragment {
     private static Realm mRealm;
     private Context context;
     private List<String> movieTrailerList = new ArrayList<>();
-    private List<String> movieReviewList = new ArrayList<>();
+    private List<String> movieReviewListReview = new ArrayList<>();
+    private List<String> movieReviewListAuthor = new ArrayList<>();
 
     public DetailActivityFragment() {
     }
@@ -182,9 +183,8 @@ public class DetailActivityFragment extends Fragment {
         protected void onPostExecute(String result) {
             Log.v(LOG_TAG, "RESULT IS" + movieTrailerList);
             RecyclerView recList = (RecyclerView) getView().findViewById(R.id.trailerCard);
-            recList.setHasFixedSize(true);
-            LinearLayoutManager llm = new LinearLayoutManager(getActivity());
-            llm.setOrientation(LinearLayoutManager.VERTICAL);
+            recList.setHasFixedSize(false);
+            LinearLayoutManager llm = new MyLinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, true);
             recList.setLayoutManager(llm);
             TrailersAdapter ta = new TrailersAdapter(createYoutubeList(),getContext());
             recList.setAdapter(ta);
@@ -206,7 +206,8 @@ public class DetailActivityFragment extends Fragment {
 
             for (int i = 0; i < reviewArray.length(); i++) {
                 JSONObject review = reviewArray.getJSONObject(i);
-                movieReviewList.add(i, review.getString("content"));
+                movieReviewListReview.add(i, review.getString("content"));
+                movieReviewListAuthor.add(i,review.getString("author"));
             }
         }
 
@@ -289,9 +290,8 @@ public class DetailActivityFragment extends Fragment {
         @Override
         protected void onPostExecute(String result) {
             RecyclerView recListReviews = (RecyclerView) getView().findViewById(R.id.reviewCard);
-            recListReviews.setHasFixedSize(true);
-            LinearLayoutManager llm = new LinearLayoutManager(getActivity());
-            llm.setOrientation(LinearLayoutManager.VERTICAL);
+            recListReviews.setHasFixedSize(false);
+            LinearLayoutManager llm = new MyLinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, true);
             recListReviews.setLayoutManager(llm);
             ReviewAdapter ra = new ReviewAdapter(createReviewList());
             recListReviews.setAdapter(ra);
@@ -311,14 +311,6 @@ public class DetailActivityFragment extends Fragment {
         TextView movieReleaseDateTextView = ButterKnife.findById(view, R.id.movieReleaseDateTextView);
         TextView movieOverviewTextView = ButterKnife.findById(view, R.id.movieOverviewTextView);
         final Button favoriteButton = ButterKnife.findById(view, R.id.favoriteButton);
-
-        // Executing FetchTrailer task
-        FetchTrailerTask ftT = new FetchTrailerTask();
-        ftT.execute();
-
-        // Executing FetchReview task
-        FetchReviewTask ftR = new FetchReviewTask();
-        ftR.execute();
 
         // Setting up the views from intent
 
@@ -406,10 +398,10 @@ public class DetailActivityFragment extends Fragment {
 
         List<ReviewInfo> result = new ArrayList<>();
         Utils.Logger("Executing Review AsyncTask");
-        for (int i=0; i < movieReviewList.size(); i++) {
+        for (int i=0; i < movieReviewListReview.size(); i++) {
             ReviewInfo ri = new ReviewInfo();
-            ri.reviewContent = movieReviewList.get(i);
-            Utils.Logger("CURRENT ELEMENT IN REVIEW ARRAY: " + movieReviewList.get(i));
+            ri.reviewAuthor = movieReviewListAuthor.get(i);
+            ri.reviewContent = movieReviewListReview.get(i);
             result.add(ri);
         }
         return result;
@@ -418,6 +410,13 @@ public class DetailActivityFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+        // Executing FetchTrailer task
+        FetchTrailerTask ftT = new FetchTrailerTask();
+        ftT.execute();
+
+        // Executing FetchReview task
+        FetchReviewTask ftR = new FetchReviewTask();
+        ftR.execute();
     }
 
     @Override

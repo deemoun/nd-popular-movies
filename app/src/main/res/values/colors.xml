@@ -5,6 +5,7 @@
     <color name="colorPrimaryDark">#e9666c</color>
     <color name="LawnGreen">#7CFC00</color>
     <color name="colorAccent">#FF4081</color>
-    <color name="backgroundColor">#000000</color>
+    <color name="blackColor">#000000</color>
+    <color name="DeepSkyBlue">#00bfff</color>
     <color name="textColorWhite">#ffffff</color>
 </resources>

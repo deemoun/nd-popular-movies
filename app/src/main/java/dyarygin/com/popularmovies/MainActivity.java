@@ -3,7 +3,6 @@ package dyarygin.com.popularmovies;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.Toast;
 
 import com.facebook.stetho.Stetho;
 
@@ -25,7 +24,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityFragm
         if (findViewById(R.id.fragmentMovieHolder) != null) {
             if (ismTwoPane()) {
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragmentMovieHolder, new DetailActivityFragment(), "TAG")
+                        .replace(R.id.fragmentMovieHolder, new EmptyDetailViewFragment(), "TAG")
                         .commit();
             }
         }
@@ -34,7 +33,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityFragm
 
     public void onMovieSelected(String movieId) {
         if (ismTwoPane()) {
-            Toast.makeText(getApplicationContext(), movieId, Toast.LENGTH_SHORT).show();
             Bundle mBundle = new Bundle();
             mBundle.putString(Config.EXTRA_MOVIEID, movieId);
 

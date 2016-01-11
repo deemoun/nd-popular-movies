@@ -18,7 +18,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -41,6 +40,8 @@ public class MainActivityFragment extends Fragment {
     private static Realm mRealm;
     private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
     private static View view;
+    // Image size format used for the displaying images
+    public final static String IMAGE_FORMAT = "w185";
     movieSelectorListener mCallback;
 
     public MainActivityFragment() {
@@ -85,9 +86,6 @@ public class MainActivityFragment extends Fragment {
         return true;
     }
 
-    // Image size format used for the displaying images
-    public final static String IMAGE_FORMAT = "w185";
-
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -130,10 +128,7 @@ public class MainActivityFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v =  inflater.inflate(R.layout.fragment_main, container, false);
-        final MainActivity mainActivity = (MainActivity) getActivity();
-
         setRetainInstance(true);
-
         // Getting current sort value from SharedPreference
 
         String sortOrderValue = getSortOrderSharedPrefs();
@@ -144,6 +139,7 @@ public class MainActivityFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+
     }
 
     @Override
@@ -199,14 +195,8 @@ public class MainActivityFragment extends Fragment {
                     }
                 });
             }
-        } else {
-            getFragmentManager().beginTransaction()
-                    .replace(R.id.fragmentMovies, new NoFavoriteMovieFragment(), "TAG")
-                    .commit();
-
-            Toast.makeText(getActivity().getApplicationContext(), "No favorite movies yet!", Toast.LENGTH_SHORT).show();
         }
-    }
+      }
 
     public void setGridView() {
         getRealmInstance();
@@ -230,8 +220,8 @@ public class MainActivityFragment extends Fragment {
             gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        Utils.Logger("Making callback to activity");
-                        mCallback.onMovieSelected(movieId[position]);
+                    Utils.Logger("Making callback to activity");
+                    mCallback.onMovieSelected(movieId[position]);
                 }
             });
         }
@@ -245,12 +235,10 @@ public class MainActivityFragment extends Fragment {
                         JSONObject movieObject = new JSONObject(movieJsonStr);
 
                         JSONArray movieArray = movieObject.getJSONArray("results");
-
                         // Base Url for the TMDB images
                         final String ImageBaseUrl = "http://image.tmdb.org/t/p/" + imageSize;
-
-                        for (int i = 0; i < movieArray.length(); i++) {
-                            JSONObject movieTitle = movieArray.getJSONObject(i);
+                            for (int i = 0; i < movieArray.length(); i++) {
+                                JSONObject movieTitle = movieArray.getJSONObject(i);
                                 mRealm.beginTransaction();
                                 Movie movieDB = new Movie();
                                 movieDB.setMovieId(movieTitle.getString("id"));
