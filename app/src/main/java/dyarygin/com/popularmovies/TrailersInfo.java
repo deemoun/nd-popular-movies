@@ -4,5 +4,5 @@ public class TrailersInfo {
     protected String title;
     protected String cardname;
 
-    protected static final String Trailer_PREFIX = "Trailer ";
+    protected static final String Trailer_PREFIX = "Watch trailer ";
 }

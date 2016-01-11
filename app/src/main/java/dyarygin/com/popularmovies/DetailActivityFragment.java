@@ -50,12 +50,13 @@ public class DetailActivityFragment extends Fragment {
 
         Bundle bundle = this.getArguments();
 
-        if(getActivity().getIntent().getStringExtra(Config.EXTRA_MOVIEID) != null){
-            return getActivity().getIntent().getStringExtra(Config.EXTRA_MOVIEID);
+        if(getActivity().getIntent().getStringExtra(Utils.EXTRA_MOVIEID) != null){
+            return getActivity().getIntent().getStringExtra(Utils.EXTRA_MOVIEID);
         } else {
             if (getArguments() != null) {
-                return bundle.getString(Config.EXTRA_MOVIEID, "140607");
+                return bundle.getString(Utils.EXTRA_MOVIEID, "140607");
             } else {
+                // Returning one of the movies just in case
                 return "140607";
             }
         }
@@ -81,7 +82,7 @@ public class DetailActivityFragment extends Fragment {
 
     public class FetchTrailerTask extends AsyncTask<String, Void, String> {
 
-        private final String LOG_TAG = FetchTrailerTask.class.getSimpleName();
+        private final String TRAILER_LOG_TAG = FetchTrailerTask.class.getSimpleName();
 
         private void getTrailerDataFromJson(String trailerJsonStr) throws JSONException {
             // Getting the root "results" array
@@ -98,7 +99,7 @@ public class DetailActivityFragment extends Fragment {
                 if(trailer.getString("site").contentEquals("YouTube")) {
                     movieTrailerList.add(i, YoutubeBaseUrl + trailer.getString("key"));
                 }
-                Log.v(LOG_TAG, "Youtube URL IS " + movieTrailerList.get(i));
+                Log.v(TRAILER_LOG_TAG, "Youtube URL IS " + movieTrailerList.get(i));
 
             }
         }
@@ -121,7 +122,7 @@ public class DetailActivityFragment extends Fragment {
                         .build();
 
                 URL url = new URL(buildUri.toString());
-                Log.e(LOG_TAG, "Trailer url is " + url);
+                Log.e(TRAILER_LOG_TAG, "Trailer url is " + url);
 
 
                 // Create the request to TMDB
@@ -149,10 +150,10 @@ public class DetailActivityFragment extends Fragment {
                     return null;
                 }
                 trailerDataStr = buffer.toString();
-                Log.e(LOG_TAG, "TRAILER STREAM IS " + trailerDataStr);
+                Log.e(TRAILER_LOG_TAG, "TRAILER STREAM IS " + trailerDataStr);
 
             } catch (IOException e) {
-                Log.e(LOG_TAG, "Error ", e);
+                Log.e(TRAILER_LOG_TAG, "Error ", e);
                 return null;
             } finally {
                 if (urlConnection != null) {
@@ -162,28 +163,24 @@ public class DetailActivityFragment extends Fragment {
                     try {
                         reader.close();
                     } catch (final IOException e) {
-                        Log.e(LOG_TAG, "Error closing stream", e);
+                        Log.e(TRAILER_LOG_TAG, "Error closing stream", e);
                     }
                 }
             }
             try {
                 getTrailerDataFromJson(trailerDataStr);
             } catch (JSONException e) {
-                Log.e(LOG_TAG, e.getMessage(), e);
+                Log.e(TRAILER_LOG_TAG, e.getMessage(), e);
                 e.printStackTrace();
             }
             return null;
         }
 
         @Override
-        protected void onPreExecute() {
-        }
-
-        @Override
         protected void onPostExecute(String result) {
-            Log.v(LOG_TAG, "RESULT IS" + movieTrailerList);
+            Log.v(TRAILER_LOG_TAG, "RESULT IS" + movieTrailerList);
             RecyclerView recList = (RecyclerView) getView().findViewById(R.id.trailerCard);
-            recList.setHasFixedSize(false);
+            recList.setHasFixedSize(true);
             LinearLayoutManager llm = new MyLinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, true);
             recList.setLayoutManager(llm);
             TrailersAdapter ta = new TrailersAdapter(createYoutubeList(),getContext());
@@ -192,10 +189,10 @@ public class DetailActivityFragment extends Fragment {
     }
 
     // Adding FetchReviewsTask
+    private final String REVIEW_LOG_TAG = "FetchReviewTask";
 
     public class FetchReviewTask extends AsyncTask<String, Void, String> {
 
-        private final String LOG_TAG = FetchTrailerTask.class.getSimpleName();
 
         private void getReviewDataFromJson(String reviewJsonStr) throws JSONException {
             // Getting the root "results" array
@@ -229,7 +226,7 @@ public class DetailActivityFragment extends Fragment {
                         .build();
 
                 URL url = new URL(buildUri.toString());
-                Log.e(LOG_TAG, "Review url is " + url);
+                Log.e(REVIEW_LOG_TAG, "Review url is " + url);
 
 
                 // Create the request to TMDB
@@ -257,10 +254,10 @@ public class DetailActivityFragment extends Fragment {
                     return null;
                 }
                 reviewDataStr = buffer.toString();
-                Log.e(LOG_TAG, "REVIEW STREAM IS " + reviewDataStr);
+                Log.e(REVIEW_LOG_TAG, "REVIEW STREAM IS " + reviewDataStr);
 
             } catch (IOException e) {
-                Log.e(LOG_TAG, "Error ", e);
+                Log.e(REVIEW_LOG_TAG, "Error ", e);
                 return null;
             } finally {
                 if (urlConnection != null) {
@@ -270,14 +267,14 @@ public class DetailActivityFragment extends Fragment {
                     try {
                         reader.close();
                     } catch (final IOException e) {
-                        Log.e(LOG_TAG, "Error closing stream", e);
+                        Log.e(REVIEW_LOG_TAG, "Error closing stream", e);
                     }
                 }
             }
             try {
                 getReviewDataFromJson(reviewDataStr);
             } catch (JSONException e) {
-                Log.e(LOG_TAG, e.getMessage(), e);
+                Log.e(REVIEW_LOG_TAG, e.getMessage(), e);
                 e.printStackTrace();
             }
             return null;
@@ -290,7 +287,7 @@ public class DetailActivityFragment extends Fragment {
         @Override
         protected void onPostExecute(String result) {
             RecyclerView recListReviews = (RecyclerView) getView().findViewById(R.id.reviewCard);
-            recListReviews.setHasFixedSize(false);
+            recListReviews.setHasFixedSize(true);
             LinearLayoutManager llm = new MyLinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, true);
             recListReviews.setLayoutManager(llm);
             ReviewAdapter ra = new ReviewAdapter(createReviewList());
@@ -427,7 +424,6 @@ public class DetailActivityFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        //movieTrailerList.clear();
         if (mRealm.isClosed()){
             // Already closed
         }
@@ -445,7 +441,6 @@ public class DetailActivityFragment extends Fragment {
         else {
             mRealm.close();
         }
-        //movieTrailerList.clear();
     }
 
     @Override

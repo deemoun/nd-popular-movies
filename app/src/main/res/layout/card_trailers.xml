@@ -13,7 +13,7 @@
             android:id="@+id/trailerCardName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="@string/card_placeholder"
             android:textColor="@color/textColorWhite"
             android:textStyle="bold"/>

@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityFragm
     public void onMovieSelected(String movieId) {
         if (ismTwoPane()) {
             Bundle mBundle = new Bundle();
-            mBundle.putString(Config.EXTRA_MOVIEID, movieId);
+            mBundle.putString(Utils.EXTRA_MOVIEID, movieId);
 
             DetailActivityFragment fragment = new DetailActivityFragment();
             fragment.setArguments(mBundle);
@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityFragm
 
         } else {
             Intent intent = new Intent(this, DetailActivity.class);
-            intent.putExtra(Config.EXTRA_MOVIEID, movieId);
+            intent.putExtra(Utils.EXTRA_MOVIEID, movieId);
             startActivity(intent);
         }
     }
